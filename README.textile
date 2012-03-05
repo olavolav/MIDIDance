@@ -4,3 +4,4 @@ Interface between a number of Arduino boards via USB and a MIDI-capable software
 Written in "Processing":http://processing.org/
 
 Detects sudden movements on any one axis and converts it to a specified MIDI tone. See comments in source code for details.
+Now writable by both Olav and Max.
