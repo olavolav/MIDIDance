@@ -96,14 +96,9 @@ class Signal {
       last_time_we_extracted_a_number = found_a_number;
     }
 
-    // println("DEBUG: Found a number? : "+found_a_number);
-    // for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-    //   println("k = "+k+", value = "+axis_dim[k].value);
-    // }
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_min_and_max();
     }
-    // print("found_a_number: "+found_a_number);
     return found_a_number;
   }
   
@@ -111,6 +106,20 @@ class Signal {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_past_value();
     }
+  }
+  
+  boolean group_is_already_playing_a_tone(int channel) {
+    boolean found_a_live_tone = false;
+    int s_group = this.axis_dim[channel].signal_group;
+    
+    for(int mm=0; mm<activeTones.length; mm++) {
+      if(this.axis_dim[activeTones[mm].signal].signal_group == s_group) {
+        found_a_live_tone = true;
+        break;
+      }
+    }
+    
+    return found_a_live_tone;
   }
   
   boolean send_controller_changes() {
@@ -137,12 +146,10 @@ class Signal {
           this.channel_of_max_velocity = j;
         }
       }
-      if(max_velocity > xthresh && !hand_is_already_playing_a_tone(this.channel_of_max_velocity)) {
+      if(max_velocity > xthresh && !this.group_is_already_playing_a_tone(this.channel_of_max_velocity)) {
         // hit!
-        // fill(line_color(channel_of_max_velocity));
-        // textAlign(CENTER, CENTER);
-        // text("shake: signal #"+this.channel_of_max_velocity,width/2,height/2);
         screen.alert("shake: signal #"+this.channel_of_max_velocity);
+        println("shake: signal #"+this.channel_of_max_velocity);
         stroke(line_color(this.channel_of_max_velocity), 200);
         line(screen.rolling+ROLLING_INCREMENT,0,screen.rolling+ROLLING_INCREMENT,height);
         new Tone(MIDI_CHANNEL,input.axis_dim[this.channel_of_max_velocity].midi_pitch,round(127+127*max_velocity),TONE_LENGTH,this.channel_of_max_velocity);

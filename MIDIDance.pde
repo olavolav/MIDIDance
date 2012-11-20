@@ -19,10 +19,7 @@ int SERIAL_PORT_NUMBER = 0;
 String inStrings[];
 Signal input;
 
-// float signals_per_draw_call = 0.;
-// int signals_per_this_draw_call = 0;
-// the y coordinate where the graphs are updated
-int BLENDDOWN_ALPHA = 10;
+int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 2;
 int NUMBER_OF_SIGNALS = 6;
 boolean DO_SIGNAL_REWIRING = false;
@@ -55,13 +52,7 @@ void setup() { /////////////////////////////////////////////////////////////////
   // int pitch = 64;
   // int velocity = 127;
   // new Tone(MIDI_CHANNEL, pitch, velocity, TONE_LENGTH, 0);
-  
-  // for(i=0; i<NUMBER_OF_SIGNALS; i++) {
-  //   oldValues[i] = 0;
-  //   valuesMinima[j] = Integer.MAX_VALUE;
-  //   valuesMaxima[j] = Integer.MIN_VALUE;
-  // }
-    
+      
   // test number extraction from inBuffer
   // println("testing number extraction:"); 
   // String[] testStrings = new String[4];
@@ -87,7 +78,6 @@ void draw() { //////////////////////////////////////////////////////////////////
   fadeOutTones();
   screen.update_value_display();
   screen.update_graphs();
-  // signals_per_this_draw_call = 0;
   
   // read values from Arduino
   while (input.read_from_port()) {
@@ -104,7 +94,6 @@ void draw() { //////////////////////////////////////////////////////////////////
   }
   delay(40);
   screen.simple_blenddown(BLENDDOWN_ALPHA);
-  // signals_per_draw_call = 0.5*signals_per_draw_call + 0.5*signals_per_this_draw_call;
 }
 
 void keyPressed() {
@@ -151,17 +140,4 @@ void keyPressed() {
         "ESC quit");
       break;
 	}
-}
-
-boolean hand_is_already_playing_a_tone(int channel) {
-  boolean found_a_live_tone = false;
-  int startchannel = 0;
-  if(channel>2) startchannel = 3;
-  for(int mm=0; mm<activeTones.length; mm++) {
-    if(activeTones[mm].signal >= startchannel && activeTones[mm].signal < startchannel+3) {
-      found_a_live_tone = true;
-      break;
-    }
-  }
-  return found_a_live_tone;
 }
