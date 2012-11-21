@@ -12,7 +12,7 @@ class Axis {
     value_min = Integer.MAX_VALUE;
     value_max = Integer.MIN_VALUE;
     is_instrument = instr;
-    if(is_instrument) midi_pitch = pitch;
+    midi_pitch = pitch;
   }
 
   void update_min_and_max() {
@@ -37,6 +37,10 @@ class Axis {
     if ((1.*this.value_max-this.value_min) <= 0) return 0;
     // if not, return so that min and max are top and bottom of window  
     return (1.*this.old_value-this.value_min) / (1.*this.value_max-this.value_min);
+  }
+  
+  void play_your_tone(float velocity, int channel_of_max_velocity) {
+    new Tone(MIDI_CHANNEL,this.midi_pitch,round(127+127*velocity),TONE_LENGTH,channel_of_max_velocity);
   }
 
 }

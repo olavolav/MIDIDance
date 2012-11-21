@@ -13,6 +13,7 @@ class Tone {
     durationMS = d;
     startMS = millis();
     signal = s;
+    println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     // append it to the list of active tones unless there is one with same the parameters c,p
     boolean is_present = false;
@@ -34,7 +35,7 @@ class Tone {
       newActiveTones[activeTones.length] = this;
       activeTones = newActiveTones;
     }
-    // println("debug in Tone: new number of active tones: "+activeTones.length);
+    // println("DEBUG: new number of active tones: "+activeTones.length);
   }
   
   void kill() {

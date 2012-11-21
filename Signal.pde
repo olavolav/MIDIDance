@@ -9,26 +9,31 @@ class Signal {
   Pattern input_text_pattern;
   Axis[] axis_dim;
   int nr_groups = 2;
-  int channel_of_max_velocity;
+  float xthresh = 0.3;
   int lines_read;
   boolean last_time_we_extracted_a_number = false;
   
-  Signal(boolean simulate_serial_input) {
+  Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
     input_text_pattern = Pattern.compile("-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s");
     axis_dim = new Axis[NUMBER_OF_SIGNALS];
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k],MIDI_PITCH_CODES[j%(MIDI_PITCH_CODES.length)]);
+      axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k],MIDI_PITCH_CODES[k%(MIDI_PITCH_CODES.length)]);
 
       // assign axis to groups (left and right hand)
-      axis_dim[k].signal_group = k/3; // HACK! for 3 axis on each controller
+      // axis_dim[k].signal_group = k/3; // HACK! for 3 axis on each controller
     }
     
     if (!simulation) {
       println(Serial.list());
-      // myPort = new Serial(this, Serial.list()[SERIAL_PORT_NUMBER], 9600);    (fails at the moment)
-      myPort = null;
+      println("Setting up connection to serial port: "+Serial.list()[SERIAL_PORT_NUMBER]);
+      myPort = new Serial(app, Serial.list()[SERIAL_PORT_NUMBER], 9600);   // (fails at the moment)
+      if(myPort == null) {
+        println("Error! Null serial port."); exit();
+      } else {
+        println("-> done.");
+      }
       lines_read = 0;
     } else {
       println("Simulating serial input...");
@@ -38,13 +43,13 @@ class Signal {
   boolean read_from_port() {
     if (!this.simulation) {
       if(this.myPort == null) return false;
-      if(myPort.available() > 0) return false;
+      if(this.myPort.available() == 0) return false;
       this.inBuffer = this.inBuffer+this.myPort.readString();
       lines_read++;
     } else {
-      inBuffer = "(simulation)";
-      lines_read++;
-      if(lines_read%2 == 0) return false;
+      this.inBuffer = "(simulation)";
+      this.lines_read++;
+      if(this.lines_read%2 == 0) return false;
     }
     return true;
   }
@@ -111,9 +116,12 @@ class Signal {
   boolean group_is_already_playing_a_tone(int channel) {
     boolean found_a_live_tone = false;
     int s_group = this.axis_dim[channel].signal_group;
+    // println("DEBUG: Call to group_is_already_playing_a_tone, s_group = "+s_group+", nr. of tones = "+activeTones.length);
     
     for(int mm=0; mm<activeTones.length; mm++) {
+      // println("DEBUG: signal group of this tone = "+this.axis_dim[activeTones[mm].signal].signal_group);
       if(this.axis_dim[activeTones[mm].signal].signal_group == s_group) {
+        // println("DEBUG: There is a tone already!");
         found_a_live_tone = true;
         break;
       }
@@ -135,24 +143,26 @@ class Signal {
   }
   
   boolean detect_hit_and_play_tone() {
+    int channel_of_max_velocity = -1;
     boolean played_a_tone = false;
+    
     for(int n=0; n<this.nr_groups; n++) {
       // once for each singal group (hand)
-      this.channel_of_max_velocity = -1;
       max_velocity = Float.MIN_VALUE;
       for(j=0; j<NUMBER_OF_SIGNALS; j++) {
         if (axis_dim[j].is_instrument && axis_dim[j].signal_group == n && velocity(j) > max_velocity) {
           max_velocity = velocity(j);
-          this.channel_of_max_velocity = j;
+          channel_of_max_velocity = j;
         }
       }
-      if(max_velocity > xthresh && !this.group_is_already_playing_a_tone(this.channel_of_max_velocity)) {
+      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(channel_of_max_velocity)) {
         // hit!
-        screen.alert("shake: signal #"+this.channel_of_max_velocity);
-        println("shake: signal #"+this.channel_of_max_velocity);
-        stroke(line_color(this.channel_of_max_velocity), 200);
+        screen.alert("shake: signal #"+channel_of_max_velocity);
+        println("shake: signal #"+channel_of_max_velocity);
+        stroke(line_color(channel_of_max_velocity), 200);
         line(screen.rolling+ROLLING_INCREMENT,0,screen.rolling+ROLLING_INCREMENT,height);
-        new Tone(MIDI_CHANNEL,input.axis_dim[this.channel_of_max_velocity].midi_pitch,round(127+127*max_velocity),TONE_LENGTH,this.channel_of_max_velocity);
+        this.axis_dim[channel_of_max_velocity].play_your_tone(max_velocity,channel_of_max_velocity);
+        // new Tone(MIDI_CHANNEL,this.axis_dim[channel_of_max_velocity].midi_pitch,round(127+127*max_velocity),TONE_LENGTH,channel_of_max_velocity);
         played_a_tone = true;
       }
       

@@ -9,12 +9,12 @@ Tone[] activeTones = new Tone[0];
 int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1"; // or "Java Sound Synthesizer" or "Native Instruments Kore Player Virtual Input"
 String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
-int[] MIDI_PITCH_CODES = {41,53,55}; //,41+1,53+1,55+1};
-boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,false,true,true};
+int[] MIDI_PITCH_CODES = {41,53,55,41+1,53+1,55+1};
+boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true};
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-boolean SIMULATE_SERIAL_INPUT = true;
+boolean SIMULATE_SERIAL_INPUT = false;
 int SERIAL_PORT_NUMBER = 0;
 String inStrings[];
 Signal input;
@@ -28,21 +28,20 @@ boolean DO_SIGNAL_REWIRING = false;
 int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 10.;
-float xthresh = 0.3;
+float INIT_SECONDS = 6.;
 float max_velocity;
-int channel_of_max_velocity;
 
 boolean DO_AVERAGE_INPUTS = false;
 Display screen;
+
 
 void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
   size(600,400);
   screen = new Display(0);
 
   // Init serial ports
-  input = new Signal(SIMULATE_SERIAL_INPUT);
-  
+  input = new Signal(this,SIMULATE_SERIAL_INPUT);
+    
   // List all available Midi devices on STDOUT. This will show each device's index and name.
   MidiBus.list();
   myBus = new MidiBus(this, -1, MIDI_DEVICE_NAME);
@@ -77,7 +76,6 @@ void setup() { /////////////////////////////////////////////////////////////////
 void draw() { //////////////////////////////////////////////////////////////////////////////// draw /////////////
   fadeOutTones();
   screen.update_value_display();
-  screen.update_graphs();
   
   // read values from Arduino
   while (input.read_from_port()) {
@@ -89,6 +87,7 @@ void draw() { //////////////////////////////////////////////////////////////////
       } else { // during init phase
         screen.alert("get ready!");
       }
+      screen.update_graphs();
     }
     input.update_temp_values();
   }
@@ -99,12 +98,12 @@ void draw() { //////////////////////////////////////////////////////////////////
 void keyPressed() {
 	switch(key) {
 		case '+':
-		  xthresh += 0.02;
-		  screen.alert("xthresh = "+xthresh);
+		  input.xthresh += 0.02;
+		  screen.alert("xthresh = "+input.xthresh);
 		  break;
 		case '-':
-		  xthresh -= 0.02;
-		  screen.alert("xthresh = "+xthresh);
+		  input.xthresh -= 0.02;
+		  screen.alert("xthresh = "+input.xthresh);
 		  break;
 		case 't':
       screen.alert("test tone (general)");
