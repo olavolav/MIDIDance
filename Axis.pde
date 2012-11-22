@@ -1,6 +1,6 @@
 class Axis {
   int value;
-  int old_value, temp_value;
+  int old_value;
   int value_min, value_max;
   int signal_group = 0;
   boolean is_instrument = true;
@@ -22,7 +22,7 @@ class Axis {
   }
 
   void update_past_value() {
-    old_value = value;
+    this.old_value = this.value;
   }
 
   float normalized_value() {

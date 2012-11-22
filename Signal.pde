@@ -28,7 +28,7 @@ class Signal {
     if (!simulation) {
       println(Serial.list());
       println("Setting up connection to serial port: "+Serial.list()[SERIAL_PORT_NUMBER]);
-      myPort = new Serial(app, Serial.list()[SERIAL_PORT_NUMBER], 9600);   // (fails at the moment)
+      myPort = new Serial(app, Serial.list()[SERIAL_PORT_NUMBER], 2*9600);
       if(myPort == null) {
         println("Error! Null serial port."); exit();
       } else {
@@ -107,7 +107,7 @@ class Signal {
     return found_a_number;
   }
   
-  void update_temp_values() {
+  void update_past_values() {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_past_value();
     }

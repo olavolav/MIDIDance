@@ -14,14 +14,14 @@ boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true};
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-boolean SIMULATE_SERIAL_INPUT = false;
+boolean SIMULATE_SERIAL_INPUT = true;
 int SERIAL_PORT_NUMBER = 0;
 String inStrings[];
 Signal input;
 
 int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 2;
-int NUMBER_OF_SIGNALS = 6;
+int NUMBER_OF_SIGNALS = 6/2;
 boolean DO_SIGNAL_REWIRING = false;
 // int[] SIGNAL_REWIRING = {0,0,0,1,1,1};
 // int[] SIGNAL_REWIRING = {0,1,0,2,3,2};
@@ -89,7 +89,7 @@ void draw() { //////////////////////////////////////////////////////////////////
       }
       screen.update_graphs();
     }
-    input.update_temp_values();
+    input.update_past_values();
   }
   delay(40);
   screen.simple_blenddown(BLENDDOWN_ALPHA);
