@@ -79,51 +79,47 @@ void draw() { //////////////////////////////////////////////////////////////////
 }
 
 void keyPressed() {
-	switch(key) {
-		case '+':
-		  input.xthresh += 0.02;
-		  screen.alert("xthresh = "+input.xthresh);
-		  break;
-		case '-':
-		  input.xthresh -= 0.02;
-		  screen.alert("xthresh = "+input.xthresh);
-		  break;
-		case 't':
-      screen.alert("test tone (general)");
-      new Tone(MIDI_CHANNEL,60,127,TONE_LENGTH,0);
-      break;
-		case '0':
-      screen.alert("test tone for axis #0!");
-      new Tone(MIDI_CHANNEL,input.axis_dim[0].midi_pitch,127,TONE_LENGTH,0);
-      break;
-		case '1':
-    screen.alert("test tone for axis #1!");
-      new Tone(MIDI_CHANNEL,input.axis_dim[1].midi_pitch,127,TONE_LENGTH,1);
-      break;
-		case '2':
-    screen.alert("test tone for axis #2!");
-      new Tone(MIDI_CHANNEL,input.axis_dim[2].midi_pitch,127,TONE_LENGTH,2);
-      break;
-		case 'd':
-		  println("--- DEBUG INFO ---");
-		  println("inBuffer = "+input.inBuffer);
-		  println("number of lines read = "+input.lines_read);
-		  println("rolling = "+screen.rolling);
-      break;
-    case 'r':
-      input.clear_buffer();
-      println("Reset input buffer.");
-      break;
-    case 'h':
-      screen.alert("help:\n"+
-        "+ raise threshold\n"+
-        "- lower threshold\n"+
-        "t play test tone\n"+
-        "h print this help message\n"+
-        "(0-9) play saved test tones\n"+
-        "r reset input buffer\n"+
-        "d print debug info\n"+
-        "ESC quit");
-      break;
+  if(key>=int('0') && key <=int('9')) {
+    int ch = int(key) - int('0');
+    if(ch <  NUMBER_OF_SIGNALS) {
+      screen.alert("test tone for axis #"+ch+"!");
+      new Tone(MIDI_CHANNEL,input.axis_dim[ch].midi_pitch,127,TONE_LENGTH,0);
+    } 
+  } else {
+  	switch(key) {
+  		case '+':
+  		  input.xthresh += 0.02;
+  		  screen.alert("xthresh = "+input.xthresh);
+  		  break;
+  		case '-':
+  		  input.xthresh -= 0.02;
+  		  screen.alert("xthresh = "+input.xthresh);
+  		  break;
+  		case 't':
+        screen.alert("test tone (general)");
+        new Tone(MIDI_CHANNEL,60,127,TONE_LENGTH,0);
+        break;
+  		case 'd':
+  		  println("--- DEBUG INFO ---");
+  		  println("inBuffer = "+input.inBuffer);
+  		  println("number of lines read = "+input.lines_read);
+  		  println("rolling = "+screen.rolling);
+        break;
+      case 'r':
+        input.clear_buffer();
+        println("Reset input buffer.");
+        break;
+      case 'h':
+        screen.alert("help:\n"+
+          "+ raise threshold\n"+
+          "- lower threshold\n"+
+          "t play test tone\n"+
+          "h print this help message\n"+
+          "(0-9) play saved test tones\n"+
+          "r reset input buffer\n"+
+          "d print debug info\n"+
+          "ESC quit");
+        break;
+  	}
 	}
 }

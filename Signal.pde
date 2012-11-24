@@ -81,8 +81,8 @@ class Signal {
       // once for each singal group (hand)
       max_velocity = Float.MIN_VALUE;
       for(j=0; j<NUMBER_OF_SIGNALS; j++) {
-        if (this.axis_dim[j].is_instrument && this.axis_dim[j].signal_group == n && this.axis_dim[j].velocity > max_velocity) {
-          max_velocity = axis_dim[j].velocity();
+        if (this.axis_dim[j].is_instrument && this.axis_dim[j].signal_group == n && this.axis_dim[j].velocity() > max_velocity) {
+          max_velocity = this.axis_dim[j].velocity();
           channel_of_max_velocity = j;
         }
       }
