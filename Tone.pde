@@ -64,8 +64,3 @@ void fadeOutTones() {
     }
   }
 }
-
-float velocity(int channel) {
-  // return abs(rescale_to_unit(values[j],j)-rescale_to_unit(oldValues[j],j));
-  return abs(input.axis_dim[j].normalized_value() - input.axis_dim[j].normalized_old_value());
-}

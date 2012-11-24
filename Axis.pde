@@ -42,5 +42,9 @@ class Axis {
   void play_your_tone(float velocity, int channel_of_max_velocity) {
     new Tone(MIDI_CHANNEL,this.midi_pitch,round(127+127*velocity),TONE_LENGTH,channel_of_max_velocity);
   }
+  
+  float velocity() {
+    return abs(this.normalized_value() - this.normalized_old_value());
+  }
 
 }
