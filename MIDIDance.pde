@@ -6,6 +6,12 @@ import themidibus.*;
 // MIDI:
 MidiBus myBus;
 Tone[] activeTones = new Tone[0];
+
+// For collecting a history of hits and adapting thresholds:
+boolean LEARNING_MODE_ENABLED = true;
+Hit[] collectedHits = new Hit[0];
+String RECORDED_HITS_OUTPUT_FILE = "test.txt";
+
 int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1"; // or "Java Sound Synthesizer" or "Native Instruments Kore Player Virtual Input"
 String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
@@ -81,24 +87,12 @@ void draw() { //////////////////////////////////////////////////////////////////
 void keyPressed() {
   if(key>=int('0') && key <=int('9')) {
     int ch = int(key) - int('0');
-    if(ch <  NUMBER_OF_SIGNALS) {
-      screen.alert("test tone for axis #"+ch+"!");
-      new Tone(MIDI_CHANNEL,input.axis_dim[ch].midi_pitch,127,TONE_LENGTH,0);
-    } 
+    if(ch <  NUMBER_OF_SIGNALS && collectedHits.length > 0) {
+      collectedHits[collectedHits.length-1].target_channel = ch;
+      screen.alert("LEARN: Set target of last hit to #"+ch+" (accuracy now "+round(100.0*accuracy_of_past_hits())+"%)");
+    }
   } else {
   	switch(key) {
-  		case '+':
-  		  input.xthresh += 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case '-':
-  		  input.xthresh -= 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case 't':
-        screen.alert("test tone (general)");
-        new Tone(MIDI_CHANNEL,60,127,TONE_LENGTH,0);
-        break;
   		case 'd':
   		  println("--- DEBUG INFO ---");
   		  println("inBuffer = "+input.inBuffer);
@@ -109,14 +103,22 @@ void keyPressed() {
         input.clear_buffer();
         println("Reset input buffer.");
         break;
+      case 'w':
+        screen.alert("Writing recorded hits to file now.");
+        String[] for_saving = new String[collectedHits.length];
+        for(int n=0; n<collectedHits.length; n++) {
+          for_saving[n] = collectedHits[n].status_information();
+        }
+        saveStrings(RECORDED_HITS_OUTPUT_FILE,for_saving);
+        break;
       case 'h':
         screen.alert("help:\n"+
           "+ raise threshold\n"+
           "- lower threshold\n"+
-          "t play test tone\n"+
           "h print this help message\n"+
-          "(0-9) play saved test tones\n"+
+          "(0-9) assign target channel to last hit\n"+
           "r reset input buffer\n"+
+          "w write recorded hits to disk\n"+
           "d print debug info\n"+
           "ESC quit");
         break;

@@ -15,6 +15,11 @@ class Tone {
     signal = s;
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
+    
+    if(LEARNING_MODE_ENABLED) {
+      new Hit(channel);
+    }
+    
     // append it to the list of active tones unless there is one with same the parameters c,p
     boolean is_present = false;
     for(int m=0; m<activeTones.length; m++) {
