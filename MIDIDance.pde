@@ -8,7 +8,7 @@ MidiBus myBus;
 Tone[] activeTones = new Tone[0];
 
 // For collecting a history of hits and adapting thresholds:
-boolean LEARNING_MODE_ENABLED = true;
+boolean LEARNING_MODE_ENABLED = false;
 Hit[] collectedHits = new Hit[0];
 String RECORDED_HITS_OUTPUT_FILE = "test.txt";
 
@@ -71,12 +71,11 @@ void draw() { //////////////////////////////////////////////////////////////////
   
   // read values from Arduino
   while (input.get_next_data_point()) {
-    // react to input, play sounds etc. after some init time
-    if(millis()/1000. > INIT_SECONDS) {
+    if(currently_in_init_phase()) {
+      screen.alert("get ready!");
+    } else { // during active phase
       input.send_controller_changes();
       input.detect_hit_and_play_tones();
-    } else { // during init phase
-      screen.alert("get ready!");
     }
     screen.update_graphs();
   }
@@ -87,9 +86,16 @@ void draw() { //////////////////////////////////////////////////////////////////
 void keyPressed() {
   if(key>=int('0') && key <=int('9')) {
     int ch = int(key) - int('0');
-    if(ch <  NUMBER_OF_SIGNALS && collectedHits.length > 0) {
-      collectedHits[collectedHits.length-1].target_channel = ch;
-      screen.alert("LEARN: Set target of last hit to #"+ch+" (accuracy now "+round(100.0*accuracy_of_past_hits())+"%)");
+    if(ch < NUMBER_OF_SIGNALS) {
+      if(LEARNING_MODE_ENABLED) {
+        if(collectedHits.length > 0) {
+          collectedHits[collectedHits.length-1].target_channel = ch;
+          screen.alert("LEARN: Set target of last hit to #"+ch+" (accuracy now "+round(100.0*accuracy_of_past_hits())+"%)");
+        }
+      } else { // no learning mode
+        screen.alert("Playing test tone of channel #"+ch);
+        input.axis_dim[ch].play_your_tone(1.0,ch);
+      }
     }
   } else {
   	switch(key) {
@@ -112,16 +118,25 @@ void keyPressed() {
         saveStrings(RECORDED_HITS_OUTPUT_FILE,for_saving);
         break;
       case 'h':
-        screen.alert("help:\n"+
+        String help_message = "help:\n"+
           "+ raise threshold\n"+
           "- lower threshold\n"+
           "h print this help message\n"+
-          "(0-9) assign target channel to last hit\n"+
           "r reset input buffer\n"+
           "w write recorded hits to disk\n"+
           "d print debug info\n"+
-          "ESC quit");
+          "ESC quit\n";
+        if(LEARNING_MODE_ENABLED) {
+          help_message += "(0-9) assign target channel to last hit";
+        } else {
+          help_message += "(0-9) play test tone of channel";
+        }        
+        screen.alert(help_message);
         break;
   	}
 	}
+}
+
+boolean currently_in_init_phase() {
+  return (millis()/1000.0 > INIT_SECONDS);
 }

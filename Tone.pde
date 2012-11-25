@@ -16,7 +16,7 @@ class Tone {
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     
-    if(LEARNING_MODE_ENABLED) {
+    if(LEARNING_MODE_ENABLED && !currently_in_init_phase()) {
       new Hit(channel);
     }
     
