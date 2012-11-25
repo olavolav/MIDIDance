@@ -8,7 +8,7 @@ MidiBus myBus;
 Tone[] activeTones = new Tone[0];
 
 // For collecting a history of hits and adapting thresholds:
-boolean LEARNING_MODE_ENABLED = false;
+boolean LEARNING_MODE_ENABLED = true;
 Hit[] collectedHits = new Hit[0];
 String RECORDED_HITS_OUTPUT_FILE = "test.txt";
 
@@ -94,7 +94,7 @@ void keyPressed() {
         }
       } else { // no learning mode
         screen.alert("Playing test tone of channel #"+ch);
-        input.axis_dim[ch].play_your_tone(1.0,ch);
+        input.axis_dim[ch].play_your_tone(127,ch);
       }
     }
   } else {
@@ -138,5 +138,5 @@ void keyPressed() {
 }
 
 boolean currently_in_init_phase() {
-  return (millis()/1000.0 > INIT_SECONDS);
+  return (millis()/1000.0 < INIT_SECONDS);
 }
