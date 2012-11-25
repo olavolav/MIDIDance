@@ -163,8 +163,10 @@ class Signal {
       last_time_we_extracted_a_number = found_a_number;
     }
 
-    for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k].update_min_and_max();
+    if(currently_in_init_phase()) {
+      for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
+        axis_dim[k].update_min_and_max();
+      }
     }
     return found_a_number;
   }

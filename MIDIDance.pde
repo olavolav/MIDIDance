@@ -32,7 +32,7 @@ boolean DO_SIGNAL_REWIRING = false;
 int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 6.;
+float INIT_SECONDS = 12.;
 float max_velocity;
 
 Display screen;
