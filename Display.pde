@@ -7,15 +7,14 @@ class Display {
   }
   
   void update_value_display() {
-    String add_for_controller;
+    String label;
     textAlign(LEFT, CENTER);
     for(int j=0; j<NUMBER_OF_SIGNALS; j++) {
-      if(input.axis_dim[j].is_instrument) add_for_controller = "";
-      else add_for_controller = "(ctrl) ";
-
+      label = AXIS_LABELS[j%(AXIS_LABELS.length)];
+      if(!input.axis_dim[j].is_instrument) label += " (ctrl)";
+      
       fill(line_color(j),200);
-      // text(add_for_controller+j+":\t "+input.axis_dim[j].value+", "+input.axis_dim[j].normalized_value(),10,20*j+10);
-      text(add_for_controller+j+":\t "+input.axis_dim[j].value,10,20*j+10);
+      text(label+" #"+j+": "+input.axis_dim[j].value,10,20*j+10);
     }
   }
   

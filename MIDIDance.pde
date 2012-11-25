@@ -10,7 +10,7 @@ Tone[] activeTones = new Tone[0];
 // For collecting a history of hits and adapting thresholds:
 boolean LEARNING_MODE_ENABLED = true;
 Hit[] collectedHits = new Hit[0];
-String RECORDED_HITS_OUTPUT_FILE = "test.txt";
+String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
 
 int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1"; // or "Java Sound Synthesizer" or "Native Instruments Kore Player Virtual Input"
@@ -20,14 +20,14 @@ boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true};
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-boolean SIMULATE_SERIAL_INPUT = true;
+boolean SIMULATE_SERIAL_INPUT = false;
 int SERIAL_PORT_NUMBER = 0;
-String inStrings[];
+int SERIAL_PORT_BAUD_RATE = 9600;
 Signal input;
 
 int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 1;
-int NUMBER_OF_SIGNALS = 6/2;
+int NUMBER_OF_SIGNALS = 6;
 boolean DO_SIGNAL_REWIRING = false;
 int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
@@ -36,7 +36,7 @@ float INIT_SECONDS = 6.;
 float max_velocity;
 
 Display screen;
-
+String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 
 void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
   size(600,400);
@@ -99,6 +99,14 @@ void keyPressed() {
     }
   } else {
   	switch(key) {
+  	  case '+':
+  		  input.xthresh += 0.02;
+  		  screen.alert("xthresh = "+input.xthresh);
+  		  break;
+  		case '-':
+  		  input.xthresh -= 0.02;
+  		  screen.alert("xthresh = "+input.xthresh);
+  		  break;
   		case 'd':
   		  println("--- DEBUG INFO ---");
   		  println("inBuffer = "+input.inBuffer);

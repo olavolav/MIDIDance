@@ -28,7 +28,7 @@ class Signal {
     if (!simulation) {
       println(Serial.list());
       println("Setting up connection to serial port: "+Serial.list()[SERIAL_PORT_NUMBER]);
-      myPort = new Serial(app, Serial.list()[SERIAL_PORT_NUMBER], 2*9600);
+      myPort = new Serial(app, Serial.list()[SERIAL_PORT_NUMBER], SERIAL_PORT_BAUD_RATE);
       if(myPort == null) {
         println("Error! Null serial port."); exit();
       } else {
