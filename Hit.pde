@@ -5,7 +5,7 @@ class Hit {
   float[] velocity_values;
   
   Hit(int ch) {
-    channel = ch;
+    channel = get_channel_from_pitch(ch);
     startMS = millis();
     
     // store velocity values for later

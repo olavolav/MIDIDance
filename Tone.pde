@@ -17,7 +17,7 @@ class Tone {
     myBus.sendNoteOn(channel, pitch, velocity);
     
     if(LEARNING_MODE_ENABLED && !currently_in_init_phase()) {
-      new Hit(channel);
+      new Hit(pitch);
     }
     
     // append it to the list of active tones unless there is one with same the parameters c,p
@@ -68,4 +68,15 @@ void fadeOutTones() {
       activeTones = newActiveTones;
     }
   }
+}
+
+int get_channel_from_pitch(int pitch) {
+  int channel = -1;
+  for (int w=0; w<NUMBER_OF_SIGNALS; w++) {
+    if(MIDI_PITCH_CODES[w%(MIDI_PITCH_CODES.length)] == pitch) {
+      channel = w;
+      break;
+    }
+  }
+  return channel;
 }
