@@ -168,12 +168,22 @@ class Signal {
         axis_dim[k].update_min_and_max();
       }
     }
+    
+    if(found_a_number || this.simulation) {
+      this.callback_on_read_new_numbers();
+    }
     return found_a_number;
   }
 
   private void update_past_values() {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_past_value();
+    }
+  }
+  
+  private void callback_on_read_new_numbers() {
+    for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
+      axis_dim[k].update_vector_of_past_values_for_hit_recording();
     }
   }
 

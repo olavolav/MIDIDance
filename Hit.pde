@@ -3,6 +3,7 @@ class Hit {
   int target_channel = -1;
   float startMS;
   float[] velocity_values;
+  float[][] value_history;
   
   Hit(int ch) {
     channel = get_channel_from_pitch(ch);
@@ -12,6 +13,14 @@ class Hit {
     velocity_values = new float[NUMBER_OF_SIGNALS];
     for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
       velocity_values[m] = input.axis_dim[m].velocity();
+    }
+    
+    // store recent history of signal for each axis
+    value_history = new float[NUMBER_OF_SIGNALS][LENGTH_OF_PAST_VALUES];
+    for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
+      for(int n=0; n<LENGTH_OF_PAST_VALUES; n++) {
+        value_history[m][n] = input.axis_dim[m].last_values_buffer[n];
+      }
     }
     
     // add this hit to list
@@ -31,7 +40,10 @@ class Hit {
   String status_information() {
     String text = startMS+", "+channel+", "+target_channel;
     for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
-      text += ", "+this.velocity_values[m];
+      // text += ", "+this.velocity_values[m];
+      for(int n=0; n<LENGTH_OF_PAST_VALUES; n++) {
+        text += ", "+this.value_history[m][n];
+      }      
     }
     return text;
   }

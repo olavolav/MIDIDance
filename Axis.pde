@@ -1,3 +1,5 @@
+int LENGTH_OF_PAST_VALUES = 3;
+
 class Axis {
   int value;
   int old_value;
@@ -5,6 +7,7 @@ class Axis {
   int signal_group = 0;
   boolean is_instrument = true;
   int midi_pitch = -1;
+  float[] last_values_buffer;
 
   Axis(boolean instr, int pitch) {
     value = 0;
@@ -13,6 +16,11 @@ class Axis {
     value_max = Integer.MIN_VALUE;
     is_instrument = instr;
     midi_pitch = pitch;
+    
+    last_values_buffer = new float[LENGTH_OF_PAST_VALUES];
+    for(int t=0; t<LENGTH_OF_PAST_VALUES; t++) {
+      last_values_buffer[t] = 0.0;
+    }
   }
 
   void update_min_and_max() {
@@ -23,6 +31,13 @@ class Axis {
 
   void update_past_value() {
     this.old_value = this.value;
+  }
+  
+  void update_vector_of_past_values_for_hit_recording() {
+    for(int t=LENGTH_OF_PAST_VALUES-1; t>0; t--) {
+      this.last_values_buffer[t] = this.last_values_buffer[t-1];
+    }
+    this.last_values_buffer[0] = this.normalized_value();
   }
 
   float normalized_value() {
