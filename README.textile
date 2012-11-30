@@ -1,7 +1,0 @@
-h1. MIDIDance
-
-Interface between a number of Arduino boards via USB and a MIDI-capable software like a synthesizer, Ableton Live etc.
-Written in "Processing":http://processing.org/
-
-Detects sudden movements on any one axis and converts it to a specified MIDI tone. See comments in source code for details.
-Now writable by both Olav and Max.
