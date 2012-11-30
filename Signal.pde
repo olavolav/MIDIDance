@@ -12,6 +12,7 @@ class Signal {
   float xthresh = 0.3;
   int lines_read;
   boolean last_time_we_extracted_a_number = false;
+  float time_of_first_signal_MS = -1.0;
   
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
@@ -133,6 +134,7 @@ class Signal {
         s_split = s.split(",");
 
         if(s_split.length != NUMBER_OF_SIGNALS) {
+          println("DEBUG: Invalid pattern, clearing input buffer!");
           inBuffer = "";
         }
 
@@ -171,6 +173,10 @@ class Signal {
     
     if(found_a_number || this.simulation) {
       this.callback_on_read_new_numbers();
+      
+      if(this.time_of_first_signal_MS < 0.0) {
+        this.time_of_first_signal_MS = millis();
+      }
     }
     return found_a_number;
   }
@@ -185,6 +191,13 @@ class Signal {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_vector_of_past_values_for_hit_recording();
     }
+  }
+  
+  float rate_of_signal_per_axis_Hz() {
+    if(this.time_of_first_signal_MS < 0.0 || this.lines_read == 0) {
+      return 0.0;
+    }
+    return (this.lines_read/this.axis_dim.length) / ((millis() - this.time_of_first_signal_MS)/1000.0);
   }
 
 }

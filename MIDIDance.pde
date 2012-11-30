@@ -111,6 +111,7 @@ void keyPressed() {
   		  println("--- DEBUG INFO ---");
   		  println("inBuffer = "+input.inBuffer);
   		  println("number of lines read = "+input.lines_read);
+  		  println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
   		  println("rolling = "+screen.rolling);
         break;
       case 'r':
