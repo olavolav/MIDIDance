@@ -1,0 +1,1017 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 8.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     39788,       1008]
+NotebookOptionsPosition[     38247,        951]
+NotebookOutlinePosition[     38604,        967]
+CellTagsIndexPosition[     38561,        964]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["1 - export of velocity only", "Section",
+ CellChangeTimes->{{3.5629281000802603`*^9, 3.562928117134906*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "SetDirectory", "[", "\"\<~/Documents/Processing/MIDIDance\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"data", "=", 
+   RowBox[{"Import", "[", 
+    RowBox[{"\"\<test1.txt\>\"", ",", "\"\<CSV\>\""}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.5628491240254*^9, 3.562849168815528*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Dimensions", "@", "data"}]], "Input",
+ CellChangeTimes->{{3.5628491710307426`*^9, 3.562849173982181*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"210", ",", "9"}], "}"}]], "Output",
+ CellChangeTimes->{3.5628491745127068`*^9}]
+}, Open  ]],
+
+Cell["\<\
+What fraction of hits was id. correctly?\
+\>", "Text",
+ CellChangeTimes->{{3.5628493111524143`*^9, 3.562849329179679*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"nrSignals", "=", "6"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Total", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"If", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+       "\[Equal]", 
+       RowBox[{"#", "\[LeftDoubleBracket]", "3", "\[RightDoubleBracket]"}]}], 
+      ",", "1", ",", "0"}], "]"}], "&"}], "/@", "data"}], 
+  "]"}], "\[IndentingNewLine]", 
+ FractionBox[
+  RowBox[{"N", "@", "%"}], 
+  RowBox[{"Length", "@", "data"}]]}], "Input",
+ CellChangeTimes->{{3.562849234906159*^9, 3.562849302158601*^9}}],
+
+Cell[BoxData["172"], "Output",
+ CellChangeTimes->{{3.5628492857171793`*^9, 3.562849302667922*^9}}],
+
+Cell[BoxData["0.8190476190476191`"], "Output",
+ CellChangeTimes->{{3.5628492857171793`*^9, 3.5628493026698093`*^9}}]
+}, Open  ]],
+
+Cell["\<\
+What fraction of correct hits was there for each axis?\
+\>", "Text",
+ CellChangeTimes->{{3.5628493111524143`*^9, 3.562849345834178*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"CorrectFraction", "[", "data_List", "]"}], ":=", 
+   FractionBox[
+    RowBox[{"N", "@", 
+     RowBox[{"Total", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+           "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+           "\[Equal]", 
+           RowBox[{
+           "#", "\[LeftDoubleBracket]", "3", "\[RightDoubleBracket]"}]}], ",",
+           "1", ",", "0"}], "]"}], "&"}], "/@", "data"}], "]"}]}], 
+    RowBox[{"Length", "@", "data"}]]}], ";"}]], "Input",
+ CellChangeTimes->{{3.562849378881332*^9, 3.562849419760706*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"CorrectFraction", "[", 
+    RowBox[{"Cases", "[", 
+     RowBox[{"data", ",", 
+      RowBox[{"{", 
+       RowBox[{"_", ",", "_", ",", "#", ",", "__"}], "}"}]}], "]"}], "]"}], 
+   "&"}], "/@", 
+  RowBox[{"Range", "[", 
+   RowBox[{"0", ",", 
+    RowBox[{"nrSignals", "-", "1"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.562849422566434*^9, 3.562849476739324*^9}, {
+  3.562849512826104*^9, 3.56284952795298*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "1.`", ",", "1.`", ",", "0.6835443037974683`", ",", "0.7931034482758621`", 
+   ",", "1.`", ",", "1.`"}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.562849427713468*^9, 3.562849477809043*^9, {3.562849516616817*^9, 
+   3.56284952831553*^9}}]
+}, Open  ]],
+
+Cell["\<\
+How do the velocity values cluster?\
+\>", "Text",
+ CellChangeTimes->{{3.562849604496151*^9, 3.56284961456046*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ListPointPlot3D", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{"Cases", "[", 
+       RowBox[{"data", ",", 
+        RowBox[{"{", 
+         RowBox[{"_", ",", "_", ",", "#", ",", "__"}], "}"}]}], "]"}], 
+      "\[LeftDoubleBracket]", 
+      RowBox[{"All", ",", 
+       RowBox[{"4", ";;", "6"}]}], "\[RightDoubleBracket]"}], "&"}], "/@", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "1", ",", "2", ",", 
+      RowBox[{"-", "1"}]}], "}"}]}], ",", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}]}], "}"}]}], ",", 
+   RowBox[{"AspectRatio", "\[Rule]", "1"}], ",", 
+   RowBox[{"PlotStyle", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"Red", ",", 
+      RowBox[{"Darker", "@", "Green"}], ",", "Blue", ",", "Black"}], 
+     "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.562849622709895*^9, 3.562849879482861*^9}, {
+  3.5628513027353992`*^9, 3.562851317173785*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   {RGBColor[1, 0, 0], Point3DBox[CompressedData["
+1:eJxTTMoPSmViYGAQAWJmID7tVeTy/NRl++Qo+f+znu21n/2x8B/X/l32sWXx
+DMslrtqz2Xrwlhbutpf3vMSwcP4O+/uVO3dput21189bzLiHdZK9t/iapqSv
+p+z9GTwZzY/esF/i5PNlf+1c+yNzfrM1Fhy1P7Dt10Ft/hv2T94ndbGfO2m/
+6O+/5n8VJ+1l9nC1/Lh9xf4Swz0mzq799l8v9zD8r9hpf7/rCIvpn7v2jOqb
+f/gnTbCfvLfnf1/WefsHv4Wd+T2u2UucOc7ywqzL/qaDLHOB9Rn7fNekJql/
+1+x9Fvv+2/P4iP3RtO3/1jzdaa9lpNicoX/RnuFP/v/iySvs1XkmdAqsO2R/
+To719inmS/abPsz6s/vxFvtoPn8uv4gL9gxgcMF+14G17Bwf2uzNfvB8OrL3
+sH0+i+k+9dpL9iv5Tv/RXLnY3nAmJ9caw4P2qQ95qtx4z9u3RXuwsH1YBg8f
+6eq7+1mjL9jf9XjLFnBrtr3llyufZL5stleJunl756cL9j8kF/x/GLHd/lsO
+z4fJkdvtZ+3YcLJ03Rm4+MMTrz4v6dtgHymU9pun/jQ8fBa8ZGTYrb3b/liD
+WTPn26v2psWTvu8+uNxeutmPQ/bLYXu3kLzDS/xP2a9n/Pv3sdksex++E5+D
+f0+wBwAvzu5j
+     "]]}, 
+   {RGBColor[0, 
+     NCache[
+      Rational[2, 3], 0.6666666666666666], 0], Point3DBox[CompressedData["
+1:eJw9kVtI0wEYxdeWtxRjKVYowcIuQ0XNCrLZUaLSLt4iBgpmYREWk3nBqRhq
+oWa5siRbmytLHc2VznlpsZypU1OW1jZGauqysmRE26xluq3/g+7hvBw+OL/v
+HNr5rOQLZBKJ5E+IQkgbxfE2ZMkgr3b95Rc7DqoH2TOshgsh6S6ZVSXF1ug9
+K0HaESxnCEyHB+sQaRfZwGRBVmRuS7w8gak3HvbNLhLsYl30jGZyUZ6iUcz5
+qvGxROyYMzY77132UvczXn9G44F282h6LQQuakvCrSqYc3OL+WfG0PI922ql
+PUZ+RDdlMa4VlTxlZB55BIqUJKsyKBVvKxas3rGDUHoLIp50zOOblL6OMy2A
+Qc5zDLEFOH2fxs1jj0JUSDU5ODz0POWvZzCFSDsx7BbF16Gw2bEMgl/TSvtD
+pTaAF6KbYhD+Gk+EbwCFua0NvUYhI5j4t1J/1abpfo5jbvO2QbYCB2cSqutY
+H9B+csCWNy1B7c9c9wfjPc7cgoErZnpkJ2ZVFpLsXSfk+0QPsy+9R/F82r8c
+gjPAGGyfaX6JQPlKxeKk3snP1w8tJfUrkbiyJUe/aa2fRnRVqpZldb3wD/0U
+6Fqqw3ZemUWqbYAfZcJrZ8cQvlwTqsVjOhQV1f9u4rahnJPmsbu4D6MNR7os
+Ni2qp89a0mP6kJnpnx+eOYym+Gifc/0a7JgwmL4au/DouMK8kVoDr3vPypLi
+1M7dzTd+kO5I+qGytxMLz4Iqjapq4vau5oqguh2eH0Ibg2F4wdJI5NLJDvfS
+DPVqD5Pgm9j2DcpXOOoT45ASPbwoIdFaDulBt2mWQmuEaFk8VfB3cgA345eu
+i9O1CJPU2lOTxfgPaSFN7A==
+     "]]}, 
+   {RGBColor[0, 0, 1], Point3DBox[CompressedData["
+1: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
+P7fgH956oLc=
+     "]]}, 
+   {GrayLevel[0], 
+    Point3DBox[{{0.33333337, 0.007999957, 0.159204}, {0.24629629, 0.28320003, 
+     0.23217249}, {0.16481483, 0.10720003, 0.36484244}, {0.03333336, 
+     0.20160002, 0.044776082}, {0.029629648, 0.011200011, 0.00497514}, {
+     0.13518518, 0.22080004, 0.0016584396}, {0.027777791, 0.23680001, 
+     0.04477611}}]}},
+  AspectRatio->1,
+  AutomaticImageSize->True,
+  Axes->True,
+  BoxRatios->{1, 1, 0.4},
+  ImageSize->{398.84720011717826`, 273.49861185009087`},
+  LabelStyle->Directive[
+   FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+  PlotRange->{{0, 1}, {0, 1}, {0, 1}},
+  PlotRangePadding->{{Automatic, Automatic}, {Automatic, Automatic}, {
+    Automatic, Automatic}},
+  ViewPoint->{-1.906343922386296, -2.7437403721650493`, 0.5364155289814376},
+  ViewVertical->{-0.3390893395379606, -0.3204072462430642, 
+   2.2112745424961457`}]], "Output",
+ CellChangeTimes->{
+  3.5628497512560673`*^9, {3.562849815949046*^9, 3.562849880091424*^9}, 
+   3.5628513179515247`*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"ListPointPlot3D", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{"Cases", "[", 
+       RowBox[{"data", ",", 
+        RowBox[{"{", 
+         RowBox[{"_", ",", "#", ",", "2", ",", "__"}], "}"}]}], "]"}], 
+      "\[LeftDoubleBracket]", 
+      RowBox[{"All", ",", 
+       RowBox[{"4", ";;", "6"}]}], "\[RightDoubleBracket]"}], "&"}], "/@", 
+    RowBox[{"{", 
+     RowBox[{"2", ",", "0", ",", "1"}], "}"}]}], ",", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}]}], "}"}]}], ",", 
+   RowBox[{"AspectRatio", "\[Rule]", "1"}], ",", 
+   RowBox[{"PlotStyle", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"Green", ",", "Red", ",", "Red", ",", "Black"}], "}"}]}]}], 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.562849622709895*^9, 3.562849904602261*^9}, {
+  3.562850872766622*^9, 3.5628508871453238`*^9}, {3.562850945334072*^9, 
+  3.562851085518251*^9}}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+2 - export of vector of past values\
+\>", "Section",
+ CellChangeTimes->{{3.5629281000802603`*^9, 3.562928147116845*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "SetDirectory", "[", "\"\<~/Documents/Processing/MIDIDance\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"data", "=", 
+   RowBox[{"Import", "[", 
+    RowBox[{"\"\<test1-max.txt\>\"", ",", "\"\<CSV\>\""}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.5628491240254*^9, 3.562849168815528*^9}, 
+   3.562928253394548*^9, {3.563268539420085*^9, 3.56326853975447*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "detect", " ", "the", " ", "length", " ", "of", " ", "the", " ", "vector", 
+    " ", "of", " ", "past", " ", "values"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"nrSignals", "=", "6"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"lengthSignals", "=", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Length", "[", 
+        RowBox[{"First", "@", "data"}], "]"}], "-", "3"}], ")"}], "/", 
+     "nrSignals"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.562928538541848*^9, 3.56292860213729*^9}, {
+  3.5629286506002607`*^9, 3.5629286562938433`*^9}, {3.563269371358656*^9, 
+  3.56326938377124*^9}}],
+
+Cell[BoxData["3"], "Output",
+ CellChangeTimes->{3.562928602983058*^9, 3.5629286566307077`*^9, 
+  3.563268543171513*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "separate", " ", "data", " ", "sets", " ", "for", " ", "different", " ", 
+    "axis"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"xdatasep", "=", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"#", "\[LeftDoubleBracket]", 
+          RowBox[{"2", ";;", "3"}], "\[RightDoubleBracket]"}], ",", 
+         RowBox[{"Partition", "[", 
+          RowBox[{
+           RowBox[{"#", "\[LeftDoubleBracket]", 
+            RowBox[{"4", ";;", 
+             RowBox[{"-", "1"}]}], "\[RightDoubleBracket]"}], ",", 
+           "lengthSignals"}], "]"}]}], "}"}], "&"}], "/@", "data"}], ")"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.562928355250339*^9, 3.562928378559484*^9}, {
+  3.5629284317756042`*^9, 3.5629284899854393`*^9}, {3.5629286955318117`*^9, 
+  3.562928717476502*^9}, {3.5632693918935423`*^9, 3.563269405288228*^9}, {
+  3.563269845166996*^9, 3.56326984921947*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp", "=", 
+   RowBox[{"Last", "@", 
+    RowBox[{"Transpose", "@", 
+     RowBox[{"Cases", "[", 
+      RowBox[{"xdatasep", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"_", ",", 
+           RowBox[{"axis", "=", "2"}]}], "}"}], ",", "__"}], "}"}]}], 
+      "]"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Mean", "[", "temp", "]"}], "\[LeftDoubleBracket]", 
+    RowBox[{"1", ";;", "3"}], "\[RightDoubleBracket]"}], ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"PlotMarkers", "\[Rule]", "Automatic"}], ",", 
+   RowBox[{"FrameLabel", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"\"\<time\>\"", ",", "\"\<norm. amplitude\>\""}], "}"}]}], ",", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"-", "0.2"}], ",", "1.2"}], "}"}]}], ",", 
+   RowBox[{"PlotLabel", "\[Rule]", 
+    RowBox[{"\"\<hit on axis #\>\"", "<>", 
+     RowBox[{"ToString", "@", "axis"}], "<>", 
+     "\"\< \[Dash] hand #0\>\""}]}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Mean", "[", "temp", "]"}], "\[LeftDoubleBracket]", 
+    RowBox[{"4", ";;", "6"}], "\[RightDoubleBracket]"}], ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"PlotMarkers", "\[Rule]", "Automatic"}], ",", 
+   RowBox[{"FrameLabel", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"\"\<time\>\"", ",", "\"\<norm. amplitude\>\""}], "}"}]}], ",", 
+   RowBox[{"PlotRange", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "1"}], "}"}]}], ",", 
+   RowBox[{"PlotLabel", "\[Rule]", 
+    RowBox[{"\"\<hit on axis #\>\"", "<>", 
+     RowBox[{"ToString", "@", "axis"}], "<>", 
+     "\"\< \[Dash] hand #1\>\""}]}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.56292890205429*^9, 3.562928948402544*^9}, {
+  3.562929054596562*^9, 3.562929085330617*^9}, {3.562929116194454*^9, 
+  3.562929291169238*^9}, {3.5629293319584217`*^9, 3.562929358836577*^9}, {
+  3.562929455694921*^9, 3.562929455854445*^9}, {3.5629294896074953`*^9, 
+  3.562929490132554*^9}, {3.562929581023128*^9, 3.5629295813905373`*^9}, {
+  3.562929677504776*^9, 3.562929686087556*^9}, {3.56326857313371*^9, 
+  3.5632686233059*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[
+  GraphicsComplexBox[{{1., 0.8422134396000002}, {2., 0.4670355767999999}, {3.,
+    0.5094861643999999}, {1., 0.9605776223999999}, {2., 0.7679422327999997}, {
+   3., 0.6582671464000001}, {1., 0.9417391207999999}, {2., 0.6835573116}, {3.,
+    0.6633201611999999}}, {{{}, {}, 
+     {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+     {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+     {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+     {Hue[0.67, 0.6, 0.6], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 1], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 2], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 3]}, 
+     {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 4], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 5], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 6]}, 
+     {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+       StyleBox["\<\"\[FilledDiamond]\"\>",
+        StripOnInput->False,
+        FontSize->10.88], 7], InsetBox[
+       StyleBox["\<\"\[FilledDiamond]\"\>",
+        StripOnInput->False,
+        FontSize->10.88], 8], InsetBox[
+       StyleBox["\<\"\[FilledDiamond]\"\>",
+        StripOnInput->False,
+        FontSize->10.88], 9]}, {}}}],
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  AxesOrigin->{0, 0},
+  Frame->True,
+  FrameLabel->{
+    FormBox["\"time\"", TraditionalForm], 
+    FormBox["\"norm. amplitude\"", TraditionalForm]},
+  ImageMargins->5,
+  LabelStyle->Directive[
+   FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+  PlotLabel->FormBox["\"hit on axis #2 \[Dash] hand #0\"", TraditionalForm],
+  PlotRange->{{0, 3.}, {-0.2, 1.2}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{
+    Scaled[0.02], Automatic}]], "Output",
+ CellChangeTimes->{
+  3.562928948833805*^9, {3.562929070767974*^9, 3.562929085792191*^9}, {
+   3.562929138769661*^9, 3.562929202130475*^9}, {3.5629292480899143`*^9, 
+   3.562929254079213*^9}, 3.5629292917782583`*^9, {3.5629293332997093`*^9, 
+   3.562929359385193*^9}, 3.562929457190896*^9, 3.562929492183524*^9, 
+   3.562929582039448*^9, {3.562929678539456*^9, 3.5629296866248207`*^9}, {
+   3.563268556446474*^9, 3.5632686239415607`*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[
+  GraphicsComplexBox[{{1., 0.5909652452}, {2., 0.5941312719999999}, {3., 
+   0.6020849428}, {1., 0.6102673792000001}, {2., 0.6144741476}, {3., 
+   0.6126916212000001}, {1., 1.}, {3., 1.}}, {{{}, {}, 
+     {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+     {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}}, {
+     {Hue[0.67, 0.6, 0.6], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 1], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 2], InsetBox[
+       StyleBox["\<\"\[FilledCircle]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 3]}, 
+     {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 4], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 5], InsetBox[
+       StyleBox["\<\"\[FilledSquare]\"\>",
+        StripOnInput->False,
+        FontSize->8.96], 6]}, {}, {}}}],
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  AxesOrigin->{0, 0},
+  Frame->True,
+  FrameLabel->{
+    FormBox["\"time\"", TraditionalForm], 
+    FormBox["\"norm. amplitude\"", TraditionalForm]},
+  ImageMargins->5,
+  LabelStyle->Directive[
+   FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+  PlotLabel->FormBox["\"hit on axis #2 \[Dash] hand #1\"", TraditionalForm],
+  PlotRange->{{0, 3.}, {0, 1}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{
+    Scaled[0.02], Automatic}]], "Output",
+ CellChangeTimes->{
+  3.562928948833805*^9, {3.562929070767974*^9, 3.562929085792191*^9}, {
+   3.562929138769661*^9, 3.562929202130475*^9}, {3.5629292480899143`*^9, 
+   3.562929254079213*^9}, 3.5629292917782583`*^9, {3.5629293332997093`*^9, 
+   3.562929359385193*^9}, 3.562929457190896*^9, 3.562929492183524*^9, 
+   3.562929582039448*^9, {3.562929678539456*^9, 3.5629296866248207`*^9}, {
+   3.563268556446474*^9, 3.563268623990066*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"rangeOfHand", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", ";;", "3"}], ",", 
+     RowBox[{"4", ";;", "6"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"GraphicsGrid", "[", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"ListPlot", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Mean", "[", 
+         RowBox[{"Last", "@", 
+          RowBox[{"Transpose", "@", 
+           RowBox[{"Cases", "[", 
+            RowBox[{"xdatasep", ",", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"_", ",", 
+                 RowBox[{"axisID", "+", 
+                  RowBox[{"3", "*", "handID"}]}]}], "}"}], ",", "__"}], 
+              "}"}]}], "]"}]}]}], "]"}], "\[LeftDoubleBracket]", 
+        RowBox[{"rangeOfHand", "\[LeftDoubleBracket]", 
+         RowBox[{"handID", "+", "1"}], "\[RightDoubleBracket]"}], 
+        "\[RightDoubleBracket]"}], ",", 
+       RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+       RowBox[{"PlotMarkers", "\[Rule]", "Automatic"}], ",", 
+       RowBox[{"FrameLabel", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{"\"\<time\>\"", ",", "\"\<norm. ampl.\>\""}], "}"}]}], ",", 
+       RowBox[{"PlotRange", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"-", "0.2"}], ",", "1.2"}], "}"}]}], ",", 
+       RowBox[{"PlotLabel", "\[Rule]", 
+        RowBox[{"\"\<hand #\>\"", "<>", 
+         RowBox[{"ToString", "[", "handID", "]"}], "<>", 
+         "\"\<: hit on axis #\>\"", "<>", 
+         RowBox[{"ToString", "[", 
+          RowBox[{"axisID", "+", 
+           RowBox[{"3", "*", "handID"}]}], "]"}]}]}], ",", 
+       RowBox[{"ImageSize", "\[Rule]", "200"}]}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"handID", ",", "0", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"axisID", ",", "0", ",", "2"}], "}"}]}], "]"}], ",", 
+   "\[IndentingNewLine]", 
+   RowBox[{"ImageSize", "\[Rule]", "1000"}]}], "\[IndentingNewLine]", 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.563269437696825*^9, 3.563269786188628*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.9293242952380951}, {2., 
+        0.5724637690476191}, {3., 0.42386598904761913`}, {1., 
+        0.9847859742857145}, {2., 0.7239986238095237}, {3., 
+        0.6360667066666666}, {1., 1.1265763238095239`}, {2., 
+        0.9003387942857143}, {3., 0.8068887628571427}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #0: hit on axis #0\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {107.5, -65.92362546665544}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}], InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.6675136490476191}, {2., 
+        0.6011669476190478}, {3., 0.5709580304761905}, {1., 
+        0.8948770823809523}, {2., 0.5721162061904762}, {3., 
+        0.4466219614285715}, {1., 0.993035938095238}, {2., 
+        0.9732730985714285}, {3., 0.9867306580952382}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #0: hit on axis #1\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {322.5, -65.92362546665544}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}], InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.8422134396000002}, {2., 
+        0.4670355767999999}, {3., 0.5094861643999999}, {1., 
+        0.9605776223999999}, {2., 0.7679422327999997}, {3., 
+        0.6582671464000001}, {1., 0.9417391207999999}, {2., 0.6835573116}, {
+        3., 0.6633201611999999}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #0: hit on axis #2\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {537.5, -65.92362546665544}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}]}, {InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.8288288254545453}, {2., 
+        0.41763191878787875`}, {3., 0.26652626696969695`}, {1., 
+        0.45778641969696954`}, {2., 0.6742289203030305}, {3., 
+        0.7954950569696969}, {1., 1.0924176742424245`}, {2., 
+        0.8413354242424242}, {3., 0.8032270712121212}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #1: hit on axis #3\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {107.5, -197.7708763999663}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}], InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.6758595228571429}, {2., 
+        0.5242691704761905}, {3., 0.4639639642857142}, {1., 
+        0.5310245380952381}, {2., 0.8553603271428569}, {3., 
+        0.961378480952381}, {1., 1.055143263809524}, {2., 
+        0.9766027619047619}, {3., 0.9659863966666669}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #1: hit on axis #4\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {322.5, -197.7708763999663}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}], InsetBox[
+      GraphicsBox[
+       GraphicsComplexBox[{{1., 0.8050193054761905}, {2., 
+        0.4600110323809525}, {3., 0.4580345654761904}, {1., 
+        0.4394788217857144}, {2., 0.6150581452380953}, {3., 
+        0.709022996904762}, {1., 0.8158111697619048}, {2., 
+        0.507936508095238}, {3., 0.5466398702380951}}, {{{}, {}, 
+          {Hue[0.67, 0.6, 0.6], LineBox[{1, 2, 3}]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], LineBox[{4, 5, 6}]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], LineBox[{7, 8, 9}]}}, {
+          {Hue[0.67, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 1], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 2], InsetBox[
+            StyleBox["\<\"\[FilledCircle]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 3]}, 
+          {Hue[0.9060679774997897, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 4], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 5], InsetBox[
+            StyleBox["\<\"\[FilledSquare]\"\>",
+             StripOnInput->False,
+             FontSize->8.96], 6]}, 
+          {Hue[0.1421359549995791, 0.6, 0.6], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 7], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 8], InsetBox[
+            StyleBox["\<\"\[FilledDiamond]\"\>",
+             StripOnInput->False,
+             FontSize->10.88], 9]}, {}}}],
+       AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+       AxesOrigin->{0, 0},
+       Frame->True,
+       FrameLabel->{
+         FormBox["\"time\"", TraditionalForm], 
+         FormBox["\"norm. ampl.\"", TraditionalForm]},
+       ImageMargins->5,
+       ImageSize->200,
+       LabelStyle->Directive[
+        FontFamily -> "Helvetica", FontSize -> 17, ImageMargins -> 8],
+       PlotLabel->FormBox["\"hand #1: hit on axis #5\"", TraditionalForm],
+       PlotRange->{{0, 3.}, {-0.2, 1.2}},
+       PlotRangeClipping->True,
+       PlotRangePadding->{
+         Scaled[0.02], Automatic}], {537.5, -197.7708763999663}, 
+      ImageScaled[{0.5, 0.5}], {200, 123.60679774997895`}]}}, {}},
+  ContentSelectable->True,
+  ImageSize->1000,
+  PlotRangePadding->{6, 5}]], "Output",
+ CellChangeTimes->{
+  3.563269512128566*^9, {3.563269564185211*^9, 3.5632695832499733`*^9}, {
+   3.5632696138469467`*^9, 3.563269662376892*^9}, {3.563269706453178*^9, 
+   3.563269787400861*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{805, 719},
+WindowMargins->{{47, Automatic}, {11, Automatic}},
+FrontEndVersion->"8.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 23, \
+2011)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 114, 1, 67, "Section"],
+Cell[696, 25, 353, 10, 43, "Input"],
+Cell[CellGroupData[{
+Cell[1074, 39, 129, 2, 27, "Input"],
+Cell[1206, 43, 119, 3, 27, "Output"]
+}, Open  ]],
+Cell[1340, 49, 132, 3, 29, "Text"],
+Cell[CellGroupData[{
+Cell[1497, 56, 613, 17, 81, "Input"],
+Cell[2113, 75, 98, 1, 27, "Output"],
+Cell[2214, 78, 116, 1, 27, "Output"]
+}, Open  ]],
+Cell[2345, 82, 146, 3, 29, "Text"],
+Cell[2494, 87, 666, 19, 49, "Input"],
+Cell[CellGroupData[{
+Cell[3185, 110, 457, 13, 27, "Input"],
+Cell[3645, 125, 280, 7, 27, "Output"]
+}, Open  ]],
+Cell[3940, 135, 124, 3, 29, "Text"],
+Cell[CellGroupData[{
+Cell[4089, 142, 1112, 32, 43, "Input"],
+Cell[5204, 176, 5174, 97, 288, "Output"]
+}, Open  ]],
+Cell[10393, 276, 1028, 29, 43, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[11458, 310, 130, 3, 37, "Section"],
+Cell[11591, 315, 428, 11, 43, "Input"],
+Cell[CellGroupData[{
+Cell[12044, 330, 698, 19, 58, "Input"],
+Cell[12745, 351, 119, 2, 27, "Output"]
+}, Open  ]],
+Cell[12879, 356, 997, 25, 43, "Input"],
+Cell[CellGroupData[{
+Cell[13901, 385, 2268, 54, 118, "Input"],
+Cell[16172, 441, 2569, 59, 269, "Output"],
+Cell[18744, 502, 2047, 47, 277, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20828, 554, 2108, 53, 148, "Input"],
+Cell[22939, 609, 15280, 338, 421, "Output"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
