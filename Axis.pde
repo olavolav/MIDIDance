@@ -1,4 +1,4 @@
-int LENGTH_OF_PAST_VALUES = 3;
+int LENGTH_OF_PAST_VALUES = 30;
 
 class Axis {
   int value;
