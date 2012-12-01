@@ -11,6 +11,7 @@ class Signal {
   int nr_groups = 2;
   float xthresh = 0.3;
   int lines_read;
+  int numbers_read = 0;
   boolean last_time_we_extracted_a_number = false;
   float time_of_first_signal_MS = -1.0;
   
@@ -139,7 +140,8 @@ class Signal {
         }
 
         for(int t=0; t<s_split.length; t++) {
-          axis_dim[t].value = int(s_split[t].trim());
+          this.axis_dim[t].value = int(s_split[t].trim());
+          this.numbers_read++;
         }
 
         if (DO_SIGNAL_REWIRING) {
@@ -160,6 +162,7 @@ class Signal {
     else { // if simulated signal
       for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
         axis_dim[k].value = round((10*k+lines_read)%height);
+        this.numbers_read++;
       }
       found_a_number = !last_time_we_extracted_a_number;  // HACK
       last_time_we_extracted_a_number = found_a_number;
@@ -197,7 +200,7 @@ class Signal {
     if(this.time_of_first_signal_MS < 0.0 || this.lines_read == 0) {
       return 0.0;
     }
-    return (this.lines_read/this.axis_dim.length) / ((millis() - this.time_of_first_signal_MS)/1000.0);
+    return (this.numbers_read/this.axis_dim.length) / ((millis() - this.time_of_first_signal_MS)/1000.0);
   }
 
 }
