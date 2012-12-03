@@ -1,21 +1,21 @@
-int LENGTH_OF_PAST_VALUES = 30;
-
 class Axis {
   int value;
   int old_value;
   int value_min, value_max;
   int signal_group = 0;
   boolean is_instrument = true;
-  int midi_pitch = -1;
+  // int midi_pitch = -1;
   float[] last_values_buffer;
 
-  Axis(boolean instr, int pitch) {
+  // Axis(boolean instr, int pitch) {
+  Axis(boolean instr, int sg) {
     value = 0;
     old_value = 0;
     value_min = Integer.MAX_VALUE;
     value_max = Integer.MIN_VALUE;
     is_instrument = instr;
-    midi_pitch = pitch;
+    signal_group = sg;
+    // midi_pitch = pitch;
     
     last_values_buffer = new float[LENGTH_OF_PAST_VALUES];
     for(int t=0; t<LENGTH_OF_PAST_VALUES; t++) {
@@ -54,9 +54,9 @@ class Axis {
     return (1.*this.old_value-this.value_min) / (1.*this.value_max-this.value_min);
   }
   
-  void play_your_tone(float velocity, int channel_of_max_velocity) {
-    new Tone(MIDI_CHANNEL,this.midi_pitch,round(127+127*this.velocity()),TONE_LENGTH,channel_of_max_velocity);
-  }
+  // void play_your_tone(float velocity, int channel_of_max_velocity) {
+  //   new Tone(MIDI_CHANNEL,this.midi_pitch,round(127+127*this.velocity()),TONE_LENGTH,channel_of_max_velocity);
+  // }
   
   float velocity() {
     return abs(this.normalized_value() - this.normalized_old_value());

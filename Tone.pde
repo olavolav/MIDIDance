@@ -4,20 +4,21 @@ class Tone {
   int velocity;
   float durationMS;
   float startMS;
-  int signal; // from which MIDI channel the tone was triggered
+  // int signal; // from which MIDI channel the tone was triggered
+  int associated_signal_group; // from which signal group the tone was triggered
   
-  Tone(int c, int p, int v, float d, int s) {
+  Tone(int c, int p, int v, float d, int s, int outcome) {
     channel = c;
     pitch = p;
     velocity = v;
     durationMS = d;
     startMS = millis();
-    signal = s;
+    associated_signal_group = s;
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     
     if(LEARNING_MODE_ENABLED && !currently_in_init_phase()) {
-      new Hit(pitch);
+      new Hit(outcome);
     }
     
     // append it to the list of active tones unless there is one with same the parameters c,p
@@ -27,7 +28,7 @@ class Tone {
         activeTones[m].velocity = v;
         activeTones[m].durationMS = d;
         activeTones[m].startMS = millis();
-        activeTones[m].signal = s;
+        activeTones[m].associated_signal_group = s;
         is_present = true;
       }
     }
@@ -70,13 +71,13 @@ void fadeOutTones() {
   }
 }
 
-int get_channel_from_pitch(int pitch) {
-  int channel = -1;
-  for (int w=0; w<NUMBER_OF_SIGNALS; w++) {
-    if(MIDI_PITCH_CODES[w%(MIDI_PITCH_CODES.length)] == pitch) {
-      channel = w;
-      break;
-    }
-  }
-  return channel;
-}
+// int get_channel_from_pitch(int pitch) {
+//   int channel = -1;
+//   for (int w=0; w<NUMBER_OF_SIGNALS; w++) {
+//     if(MIDI_PITCH_CODES[w%(MIDI_PITCH_CODES.length)] == pitch) {
+//       channel = w;
+//       break;
+//     }
+//   }
+//   return channel;
+// }

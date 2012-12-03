@@ -21,7 +21,7 @@ class Signal {
     axis_dim = new Axis[NUMBER_OF_SIGNALS];
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k],MIDI_PITCH_CODES[k%(MIDI_PITCH_CODES.length)]);
+      axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k], SIGNAL_GROUP_OF_AXIS[k]);
 
       // assign axis to groups (left and right hand)
       // axis_dim[k].signal_group = k/3; // HACK! for 3 axis on each controller
@@ -46,20 +46,18 @@ class Signal {
     this.inBuffer = "";
   }
   
-  boolean group_is_already_playing_a_tone(int channel) {
+  boolean group_is_already_playing_a_tone(int s_group) {
     boolean found_a_live_tone = false;
-    int s_group = this.axis_dim[channel].signal_group;
     // println("DEBUG: Call to group_is_already_playing_a_tone, s_group = "+s_group+", nr. of tones = "+activeTones.length);
     
     for(int mm=0; mm<activeTones.length; mm++) {
-      // println("DEBUG: signal group of this tone = "+this.axis_dim[activeTones[mm].signal].signal_group);
-      if(this.axis_dim[activeTones[mm].signal].signal_group == s_group) {
+      // println("DEBUG: signal group of this tone = "+activeTones[mm].associated_signal_group);
+      if(activeTones[mm].associated_signal_group == s_group) {
         // println("DEBUG: There is a tone already!");
         found_a_live_tone = true;
         break;
       }
     }
-    
     return found_a_live_tone;
   }
   
@@ -76,7 +74,7 @@ class Signal {
   }
   
   boolean detect_hit_and_play_tones() {
-    int channel_of_max_velocity = -1;
+    int axis_of_max_velocity = -1;
     boolean played_a_tone = false;
     
     for(int n=0; n<this.nr_groups; n++) {
@@ -85,16 +83,28 @@ class Signal {
       for(j=0; j<NUMBER_OF_SIGNALS; j++) {
         if (this.axis_dim[j].is_instrument && this.axis_dim[j].signal_group == n && this.axis_dim[j].velocity() > max_velocity) {
           max_velocity = this.axis_dim[j].velocity();
-          channel_of_max_velocity = j;
+          axis_of_max_velocity = j;
         }
       }
-      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(channel_of_max_velocity)) {
+      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(input.axis_dim[axis_of_max_velocity].signal_group)) {
         // hit!
-        screen.alert("shake: signal #"+channel_of_max_velocity);
-        println("shake: signal #"+channel_of_max_velocity);
-        stroke(line_color(channel_of_max_velocity), 200);
+        stroke(line_color(axis_of_max_velocity), 200);
         line(screen.rolling+ROLLING_INCREMENT,0,screen.rolling+ROLLING_INCREMENT,height);
-        this.axis_dim[channel_of_max_velocity].play_your_tone(max_velocity,channel_of_max_velocity);
+        // this.axis_dim[axis_of_max_velocity].play_your_tone(max_velocity,axis_of_max_velocity);
+
+        if(!currently_in_recording_phase) {
+          int most_likely_outcome = analyzer.detect(input.axis_dim[axis_of_max_velocity].signal_group);
+          if( most_likely_outcome >= 0 ) {
+            analyzer.outcomes[most_likely_outcome].play_your_tone(1.9); //max_velocity);
+          }
+          screen.alert("shake: outcome #"+most_likely_outcome+"("+analyzer.outcomes[most_likely_outcome].label+")");
+          println("shake: likely outcome #"+most_likely_outcome+"("+analyzer.outcomes[most_likely_outcome].label+")");
+        } else {
+          screen.alert("recording shake: axis #"+axis_of_max_velocity);
+          println("recording shake: signal #"+axis_of_max_velocity);
+          analyzer.outcomes[int(axis_of_max_velocity/3)+1].play_your_tone(1.9); //max_velocity);
+          // new Hit(-2);
+        }
         played_a_tone = true;
       }
       

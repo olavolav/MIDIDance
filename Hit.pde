@@ -1,12 +1,14 @@
 class Hit {
-  int channel;
-  int target_channel = -1;
+  int actual_outcome;
+  int target_outcome = 0;
   float startMS;
   float[] velocity_values;
   float[][] value_history;
   
-  Hit(int ch) {
-    channel = get_channel_from_pitch(ch);
+  Hit(int out) {
+    // actual_outcome = get_channel_from_pitch(ch);
+    actual_outcome = out;
+    println("DEBUG: creating a Hit object: actual_outcome = "+actual_outcome+", target_outcome = "+target_outcome);
     startMS = millis();
     
     // store velocity values for later
@@ -34,11 +36,11 @@ class Hit {
   }
   
   boolean was_correctly_identified() {
-    return (this.channel == this.target_channel);
+    return (this.actual_outcome == this.target_outcome);
   }
   
   String status_information() {
-    String text = startMS+", "+channel+", "+target_channel;
+    String text = startMS+", "+actual_outcome+", "+target_outcome;
     for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
       // text += ", "+this.velocity_values[m];
       for(int n=0; n<LENGTH_OF_PAST_VALUES; n++) {
