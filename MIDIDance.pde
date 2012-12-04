@@ -20,6 +20,7 @@ float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
 boolean SIMULATE_SERIAL_INPUT = false;
+int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 int SERIAL_PORT_NUMBER = 0;
 int SERIAL_PORT_BAUD_RATE = 9600;
 Signal input;
@@ -30,11 +31,13 @@ int LENGTH_OF_PAST_VALUES = 30;
 String[] OUTCOMES_LABEL = {"null-right", "null-left", "right-out", "left-down"};
 int[] MIDI_PITCH_CODES = {-1,-1,41,53,55,41+1,53+1,55+1}; // one for each outcome
 int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0}; //, 0, 0, 1, 1, 1};
+int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
 boolean currently_in_recording_phase = false;
 int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 20;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
+int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
 int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 1;
@@ -43,11 +46,12 @@ boolean DO_SIGNAL_REWIRING = false;
 int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 12.;
+float INIT_SECONDS = 15.;
 float max_velocity;
 
 Display screen;
 String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
+int last_displayed_second_init, current_second_init;
 
 void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
   
@@ -71,6 +75,7 @@ void setup() { /////////////////////////////////////////////////////////////////
   MidiBus.list();
   myBus = new MidiBus(this, -1, MIDI_DEVICE_NAME);
   delay(500);
+  last_displayed_second_init = ceil(INIT_SECONDS - millis()/1000.0);
 }
 
 void draw() { //////////////////////////////////////////////////////////////////////////////// draw /////////////
@@ -81,6 +86,11 @@ void draw() { //////////////////////////////////////////////////////////////////
   while (input.get_next_data_point()) {
     if(currently_in_init_phase()) {
       screen.alert("get ready!");
+      current_second_init = ceil(INIT_SECONDS - millis()/1000.0);
+      if( current_second_init < last_displayed_second_init ) {
+        if( current_second_init < 10 ) { screen.huge_alert(str(current_second_init)); }
+        last_displayed_second_init = current_second_init;
+      }
     } else { // during active phase
       input.send_controller_changes();
       input.detect_hit_and_play_tones();
@@ -123,6 +133,7 @@ void keyPressed() {
   		  println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
   		  println("rolling = "+screen.rolling);
   		  println("number of recoded hits = "+collectedHits.length);
+  		  println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
         break;
       case 'r':
         input.clear_buffer();
@@ -177,9 +188,10 @@ boolean test_setup() {
   if(SIGNAL_GROUP_OF_OUTCOME.length != OUTCOMES_LABEL.length) { println("test_setup: error #2!"); all_fine = false; }
   if(LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS > LENGTH_OF_PAST_VALUES) { println("test_setup: error #3!"); all_fine = false; }
   if(DO_SIGNAL_REWIRING) { println("test_setup: error #4!"); all_fine = false; } // not implemented yet
+  if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #5!"); all_fine = false; }
   
   for(int oo=0; oo<OUTCOMES_LABEL.length; oo++) {
-    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #5!"); all_fine = false; }
+    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #6!"); all_fine = false; }
   }
   
   return all_fine;

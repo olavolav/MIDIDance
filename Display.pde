@@ -38,6 +38,14 @@ class Display {
   }
     
   void alert(String message) {
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    fill(#FFFFFF);
+    text(message,width/2,height/2);
+  }
+
+  void huge_alert(String message) {
+    textSize(200);
     textAlign(CENTER, CENTER);
     fill(#FFFFFF);
     text(message,width/2,height/2);

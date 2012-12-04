@@ -17,7 +17,7 @@ class Signal {
   
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
-    input_text_pattern = Pattern.compile("-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s");
+    input_text_pattern = Pattern.compile("\\s*-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s+");
     axis_dim = new Axis[NUMBER_OF_SIGNALS];
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
@@ -53,7 +53,7 @@ class Signal {
     for(int mm=0; mm<activeTones.length; mm++) {
       // println("DEBUG: signal group of this tone = "+activeTones[mm].associated_signal_group);
       if(activeTones[mm].associated_signal_group == s_group) {
-        // println("DEBUG: There is a tone already!");
+        // println("DEBUG: There is a tone for that signal group tone playing already!");
         found_a_live_tone = true;
         break;
       }
@@ -75,6 +75,7 @@ class Signal {
   
   boolean detect_hit_and_play_tones() {
     int axis_of_max_velocity = -1;
+    int signal_group_of_max_velocity = 0;
     boolean played_a_tone = false;
     
     for(int n=0; n<this.nr_groups; n++) {
@@ -86,25 +87,29 @@ class Signal {
           axis_of_max_velocity = j;
         }
       }
-      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(input.axis_dim[axis_of_max_velocity].signal_group)) {
+      
+      if( axis_of_max_velocity >= 0 ) {
+        signal_group_of_max_velocity = input.axis_dim[axis_of_max_velocity].signal_group;
+      }
+      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(signal_group_of_max_velocity)) {
         // hit!
         stroke(line_color(axis_of_max_velocity), 200);
         line(screen.rolling+ROLLING_INCREMENT,0,screen.rolling+ROLLING_INCREMENT,height);
-        // this.axis_dim[axis_of_max_velocity].play_your_tone(max_velocity,axis_of_max_velocity);
 
-        if(!currently_in_recording_phase) {
-          int most_likely_outcome = analyzer.detect(input.axis_dim[axis_of_max_velocity].signal_group);
+        if( currently_in_recording_phase ) {
+          screen.alert("recording shake: axis #"+axis_of_max_velocity);
+          println("recording shake: axis #"+axis_of_max_velocity+", signal group #"+signal_group_of_max_velocity);
+          analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[signal_group_of_max_velocity]].play_your_tone(1.9);
+        }
+        else { // after recording phase
+          int most_likely_outcome = analyzer.detect( signal_group_of_max_velocity );
           if( most_likely_outcome >= 0 ) {
             analyzer.outcomes[most_likely_outcome].play_your_tone(1.9); //max_velocity);
           }
-          screen.alert("shake: outcome #"+most_likely_outcome+"("+analyzer.outcomes[most_likely_outcome].label+")");
-          println("shake: likely outcome #"+most_likely_outcome+"("+analyzer.outcomes[most_likely_outcome].label+")");
-        } else {
-          screen.alert("recording shake: axis #"+axis_of_max_velocity);
-          println("recording shake: signal #"+axis_of_max_velocity);
-          analyzer.outcomes[int(axis_of_max_velocity/3)+1].play_your_tone(1.9); //max_velocity);
-          // new Hit(-2);
+          screen.alert("shake: outcome #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
+          println("shake: likely outcome #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
         }
+        
         played_a_tone = true;
       }
       
@@ -142,16 +147,23 @@ class Signal {
       if (m.find()) {
         found_a_number = true;
         s = m.group(0).trim();
-        s_split = s.split(",");
+        s_split = s.trim().split(",");
 
         if(s_split.length != NUMBER_OF_SIGNALS) {
           println("DEBUG: Invalid pattern, clearing input buffer!");
           inBuffer = "";
         }
 
-        for(int t=0; t<s_split.length; t++) {
-          this.axis_dim[t].value = int(s_split[t].trim());
-          this.numbers_read++;
+        if(lines_read > NUMBER_OF_LINES_TO_SKIP_ON_INIT) {
+          for(int t=0; t<s_split.length; t++) {
+            this.axis_dim[t].value = int(s_split[t].trim());
+            this.numbers_read++;
+            
+            // DEBUG
+            if(this.axis_dim[t].value > 900) {
+              print("DEBUG: large number! inBuffer = "+this.inBuffer);
+            }
+          }
         }
 
         if (DO_SIGNAL_REWIRING) {
@@ -166,7 +178,7 @@ class Signal {
         }
 
         // remove characters from inBuffer
-        inBuffer = inBuffer.substring(0,m.start(0))+inBuffer.substring(m.end(0),inBuffer.length());
+        inBuffer = inBuffer.substring(0,m.start(0)) + inBuffer.substring(m.end(0),inBuffer.length());
       }
     }
     else { // if simulated signal

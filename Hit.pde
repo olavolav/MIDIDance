@@ -1,14 +1,15 @@
 class Hit {
   int actual_outcome;
-  int target_outcome = 0;
+  int target_outcome;
   float startMS;
   float[] velocity_values;
   float[][] value_history;
   
-  Hit(int out) {
-    // actual_outcome = get_channel_from_pitch(ch);
+  // Hit(int out) { Hit(out,0); }
+  Hit(int out, int target_out) {
     actual_outcome = out;
-    println("DEBUG: creating a Hit object: actual_outcome = "+actual_outcome+", target_outcome = "+target_outcome);
+    target_outcome = target_out;
+    // println("DEBUG: creating a Hit object: actual_outcome = "+actual_outcome+", target_outcome = "+target_outcome);
     startMS = millis();
     
     // store velocity values for later

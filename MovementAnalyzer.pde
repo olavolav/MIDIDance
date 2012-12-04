@@ -68,7 +68,7 @@ class MovementAnalyzer {
   }
   
   int detect(int triggering_signal_group) {
-    int most_likely_outcome = triggering_signal_group; //           <---------- mildly evil HACK
+    int most_likely_outcome = NULL_OUTCOME_FOR_SIGNAL_GROUP[triggering_signal_group];
     float highest_log_probability = Float.MIN_VALUE;
     float log_probability;
     for(int oo=0; oo<this.outcomes.length; oo++) {
@@ -92,6 +92,18 @@ class MovementAnalyzer {
   boolean save_target_movements_to_file() {
     println("Warning: MovementAnalyzer#save_target_movements_to_file() is not implemented yet!");
     return false;
+  }
+  
+  String status_of_recorded_hits_per_outcome() {
+    String status = "";
+    int[] counter_outcome = new int[this.outcomes.length];
+    for(int oo=0; oo<this.outcomes.length; oo++) { counter_outcome[oo] = 0; }
+    for (int hit_i=0; hit_i<collectedHits.length; hit_i++) { counter_outcome[collectedHits[hit_i].target_outcome] += 1; }
+    for(int oo=0; oo<this.outcomes.length; oo++) {
+      if( oo > 0 ) { status += ", "; }
+      status += counter_outcome[oo]+" for #"+oo+" ("+this.outcomes[oo].label+")";
+    }
+    return status;
   }
   
 }

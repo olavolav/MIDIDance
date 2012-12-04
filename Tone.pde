@@ -18,7 +18,7 @@ class Tone {
     myBus.sendNoteOn(channel, pitch, velocity);
     
     if(LEARNING_MODE_ENABLED && !currently_in_init_phase()) {
-      new Hit(outcome);
+      new Hit(outcome, NULL_OUTCOME_FOR_SIGNAL_GROUP[associated_signal_group]);
     }
     
     // append it to the list of active tones unless there is one with same the parameters c,p
