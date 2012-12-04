@@ -14,6 +14,8 @@ class Signal {
   int numbers_read = 0;
   boolean last_time_we_extracted_a_number = false;
   float time_of_first_signal_MS = -1.0;
+  String read_input_line;
+  float time_of_last_line_read_ms;
   
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
@@ -107,7 +109,7 @@ class Signal {
             analyzer.outcomes[most_likely_outcome].play_your_tone(1.9); //max_velocity);
           }
           screen.alert("shake: outcome #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
-          println("shake: likely outcome #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
+          println("shake: likely outcome is #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
         }
         
         played_a_tone = true;
@@ -128,8 +130,11 @@ class Signal {
     if (!this.simulation) {
       if(this.myPort == null) return false;
       if(this.myPort.available() == 0) return false;
-      this.inBuffer = this.inBuffer+this.myPort.readString();
+      this.read_input_line = this.myPort.readString();
+      this.inBuffer = this.inBuffer+this.read_input_line;
       lines_read++;
+      if( millis() - this.time_of_first_signal_MS > 500.0 ) { screen.alert("signal lost!"); }
+      if( this.read_input_line.trim() != "" ) { this.time_of_first_signal_MS = millis(); }
     } else {
       this.inBuffer = "(simulation)";
       this.lines_read++;

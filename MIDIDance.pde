@@ -28,14 +28,15 @@ int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 int LENGTH_OF_PAST_VALUES = 30;
 
 // The Bayesian movement analyzer:
-String[] OUTCOMES_LABEL = {"null-right", "null-left", "right-out", "left-down"};
+String[] OUTCOMES_LABEL = {"null-right", "null-left", "right-grab-right", "right-downslap-left", "right-fistclench"};
+//right-dive-right", "right-dive-left", "right-dive-forward"};
 int[] MIDI_PITCH_CODES = {-1,-1,41,53,55,41+1,53+1,55+1}; // one for each outcome
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0}; //, 0, 0, 1, 1, 1};
+int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0};
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
 boolean currently_in_recording_phase = false;
-int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 20;
+int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 15;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
