@@ -71,7 +71,7 @@ class MovementAnalyzer {
     int most_likely_outcome = NULL_OUTCOME_FOR_SIGNAL_GROUP[triggering_signal_group];
     float highest_log_probability = -0.5*Float.MAX_VALUE;
     float log_probability;
-    for(int oo=2; oo<this.outcomes.length; oo++) {
+    for(int oo=2; oo<this.outcomes.length; oo++) { //                              <----- HACK
       if(this.outcomes[oo].associated_signal_group == triggering_signal_group) {
         log_probability = this.outcomes[oo].compute_bayesian_log_probability();
         if( log_probability > highest_log_probability ) {

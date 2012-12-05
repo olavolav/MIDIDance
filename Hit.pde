@@ -5,7 +5,6 @@ class Hit {
   float[] velocity_values;
   float[][] value_history;
   
-  // Hit(int out) { Hit(out,0); }
   Hit(int out, int target_out) {
     actual_outcome = out;
     target_outcome = target_out;
@@ -41,9 +40,8 @@ class Hit {
   }
   
   String status_information() {
-    String text = startMS+", "+actual_outcome+", "+target_outcome;
+    String text = this.startMS+", "+this.actual_outcome+", "+this.target_outcome;
     for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
-      // text += ", "+this.velocity_values[m];
       for(int n=0; n<LENGTH_OF_PAST_VALUES; n++) {
         text += ", "+this.value_history[m][n];
       }      

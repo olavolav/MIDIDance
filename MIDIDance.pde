@@ -11,6 +11,7 @@ Tone[] activeTones = new Tone[0];
 boolean LEARNING_MODE_ENABLED = true;
 Hit[] collectedHits = new Hit[0];
 String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
+String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
 
 int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1"; // or "Java Sound Synthesizer" or "Native Instruments Kore Player Virtual Input"
@@ -25,13 +26,14 @@ int SERIAL_PORT_NUMBER = 0;
 int SERIAL_PORT_BAUD_RATE = 9600;
 Signal input;
 int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
+// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
 int LENGTH_OF_PAST_VALUES = 30;
 
 // The Bayesian movement analyzer:
-String[] OUTCOMES_LABEL = {"null-right", "null-left", "right-grab-right", "right-downslap-left", "right-fistclench"};
-//right-dive-right", "right-dive-left", "right-dive-forward"};
-int[] MIDI_PITCH_CODES = {-1,-1,41,53,55,41+1,53+1,55+1}; // one for each outcome
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0};
+String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
+int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
+int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0};
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
@@ -47,7 +49,7 @@ boolean DO_SIGNAL_REWIRING = false;
 int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 15.;
+float INIT_SECONDS = 12.;
 float max_velocity;
 
 Display screen;
@@ -141,12 +143,15 @@ void keyPressed() {
         println("Reset input buffer.");
         break;
       case 'w':
-        screen.alert("Writing recorded hits to file now.");
-        String[] for_saving = new String[collectedHits.length];
-        for(int n=0; n<collectedHits.length; n++) {
-          for_saving[n] = collectedHits[n].status_information();
+        save_hits_information_to_file(RECORDED_HITS_OUTPUT_FILE);
+        screen.alert("Wrote recorded hits to file.");
+        break;
+      case 'l':
+        if( load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
+          screen.alert("Loaded recorded hits from file.");
+        } else {
+          screen.alert("Error: Failed to load hits from file.");
         }
-        saveStrings(RECORDED_HITS_OUTPUT_FILE,for_saving);
         break;
       case 'z':
         if( LEARNING_MODE_ENABLED ) {
@@ -196,4 +201,71 @@ boolean test_setup() {
   }
   
   return all_fine;
+}
+
+void save_hits_information_to_file(String file_name) {
+  String[] for_saving = new String[ 3 + analyzer.outcomes.length + 1 + collectedHits.length ];
+  int line_count = 0;
+  // 1st step: save set-up and set of possible outcomes
+  for_saving[line_count++] = str( NUMBER_OF_SIGNALS );
+  for_saving[line_count++] = str( LENGTH_OF_PAST_VALUES );
+  for_saving[line_count++] = str( analyzer.outcomes.length );
+  for(int n=0; n<analyzer.outcomes.length; n++) {
+    for_saving[line_count++] = analyzer.outcomes[n].status_information();
+  }
+  // 2nd step: save recorded hits 
+  for_saving[line_count++] = str(collectedHits.length);
+  for(int n=0; n<collectedHits.length; n++) {
+    for_saving[line_count++] = collectedHits[n].status_information();
+  }
+  // write to file
+  saveStrings(file_name,for_saving);
+}
+
+boolean load_hits_information_from_file(String file_name) {
+  String[] for_loading = loadStrings(file_name);
+  int line_count = 0;
+  int putative_number_of_axis = int( for_loading[line_count++] );
+  if( putative_number_of_axis != NUMBER_OF_SIGNALS ) {
+    println("Error while loading hits: number of axis ("+putative_number_of_axis+") does not match current set-up!");
+    return false;
+  }
+
+  int putative_length_of_past_vector = int( for_loading[line_count++] );
+  if( putative_length_of_past_vector != LENGTH_OF_PAST_VALUES ) {
+    println("Error while loading hits: length of past values ("+putative_length_of_past_vector+") does not match current set-up!");
+    return false;
+  }
+
+  int putative_number_of_outcomes = int( for_loading[line_count++] );
+  if( putative_number_of_outcomes != analyzer.outcomes.length ) {
+    println("Error while loading hits: number of outcomes ("+putative_number_of_outcomes+") does not match current set-up!");
+    return false;
+  }
+
+  for(int n=0; n<putative_number_of_outcomes; n++) {
+    println("outcome #"+n+" in file was: "+for_loading[line_count++]);
+  }
+  int putative_number_of_hits = int( for_loading[line_count++] );
+  if( for_loading.length != 3 + analyzer.outcomes.length + 1 + putative_number_of_hits ) {
+    println("Error while loading hits: File format unknown!");
+    return false;
+  }
+
+  collectedHits = new Hit[0];
+  for(int n=0; n<putative_number_of_hits; n++) {
+    String[] hit_detail = for_loading[line_count++].split(",");
+    int element = 1; // skipping the time stamp
+    int actual_oo = int(hit_detail[element++].trim());
+    int target_oo = int(hit_detail[element++].trim());
+    println("hit #"+n+" in file was for target outcome #"+target_oo);
+    
+    Hit new_hit = new Hit(actual_oo,target_oo);
+    for(int m=0; m<NUMBER_OF_SIGNALS; m++) {
+      for(int n2=0; n2<LENGTH_OF_PAST_VALUES; n2++) {
+        new_hit.value_history[m][n2] = float(hit_detail[element++].trim());
+      }
+    }
+  }
+  return true;
 }
