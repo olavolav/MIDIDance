@@ -67,7 +67,7 @@ class Signal {
     boolean updated_a_controller = false;
 
     for(j=0; j<NUMBER_OF_SIGNALS; j++) {
-      if(!axis_dim[j].is_instrument && axis_dim[j].old_value != axis_dim[j].value) {
+      if( !axis_dim[j].is_instrument && abs(axis_dim[j].normalized_old_value()-axis_dim[j].value) > 0.01 ) {
       	myBus.sendControllerChange(MIDI_CHANNEL, j, round(127*axis_dim[j].normalized_value())); // Send a controllerChange
       	updated_a_controller = true;
       }
@@ -120,7 +120,6 @@ class Signal {
   }
   
   boolean get_next_data_point() {
-    this.update_past_values();
     // read new numbers from buffer or input port
     if(this.extract_next_set_of_numbers_from_buffer()) return true;
     return this.read_from_port();
@@ -200,15 +199,9 @@ class Signal {
     return found_a_number;
   }
 
-  private void update_past_values() {
-    for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k].update_past_value();
-    }
-  }
-  
   private void callback_on_read_new_numbers() {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k].update_vector_of_past_values_for_hit_recording();
+      axis_dim[k].update_vector_of_past_values();
     }
   }
   
