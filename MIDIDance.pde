@@ -3,24 +3,24 @@ import themidibus.*;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////// init /////////////
 
-// MIDI:
-MidiBus myBus;
-Tone[] activeTones = new Tone[0];
-
 // For collecting a history of hits and adapting thresholds:
-boolean LEARNING_MODE_ENABLED = true;
 Hit[] collectedHits = new Hit[0];
 String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
 String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
 
+// the MIDI bus:
+MidiBus myBus;
+Tone[] activeTones = new Tone[0];
 int MIDI_CHANNEL = 0;
-// String MIDI_DEVICE_NAME = "IAC-Bus 1"; // or "Java Sound Synthesizer" or "Native Instruments Kore Player Virtual Input"
-String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+// String MIDI_DEVICE_NAME = "IAC-Bus 1";
+String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
+// String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+
 boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-boolean SIMULATE_SERIAL_INPUT = false;
+boolean SIMULATE_SERIAL_INPUT = true;
 int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 int SERIAL_PORT_NUMBER = 0;
 int SERIAL_PORT_BAUD_RATE = 9600;
@@ -29,15 +29,29 @@ int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
 int LENGTH_OF_PAST_VALUES = 30;
 
-// The Bayesian movement analyzer:
-String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
-int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0};
+// The display:
+Display screen;
+String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
+int last_displayed_second_init, current_second_init;
+
+// Option A) The Bayesian movement analyzer:
+// boolean BAYESIAN_MODE_ENABLED = true;
+// String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
+// int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
+
+// Option B) The velocity threshold analyzer:
+boolean BAYESIAN_MODE_ENABLED = false;
+String[] OUTCOMES_LABEL = AXIS_LABELS;
+int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
+int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
+
+// The general analyzer paramters:
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
-boolean currently_in_recording_phase = false;
+boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
 int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 15;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
@@ -50,16 +64,16 @@ color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
 float INIT_SECONDS = 12.;
 float max_velocity;
 
-Display screen;
-String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
-int last_displayed_second_init, current_second_init;
 
 void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
   
   if(test_setup() == false) {
-    println("-> Error: Invalid setup parameters!");
+    println("-> Error: Invalid setup parameters! (see test_setup() in MIDIDance.pde for details)");
     exit();
   }
+  
+  if( BAYESIAN_MODE_ENABLED ) { println("Hit detector mode: Bayesian"); }
+  else { println("Hit detector mode: Max. velocity"); }
   
   size(600,400);
   screen = new Display(0);
@@ -68,9 +82,6 @@ void setup() { /////////////////////////////////////////////////////////////////
   input = new Signal(this,SIMULATE_SERIAL_INPUT);
   
   analyzer = new MovementAnalyzer();
-  if(LEARNING_MODE_ENABLED) {
-    currently_in_recording_phase = true;
-  }
     
   // List all available Midi devices on STDOUT. This will show each device's index and name.
   MidiBus.list();
@@ -106,14 +117,13 @@ void keyPressed() {
   if(key>=int('0') && key <=int('9')) {
     int ch = int(key) - int('0');
     if(ch < OUTCOMES_LABEL.length) {
-      if(LEARNING_MODE_ENABLED) {
+      if( BAYESIAN_MODE_ENABLED ) {
         if(collectedHits.length > 0) {
           collectedHits[collectedHits.length-1].target_outcome = ch;
           screen.alert("LEARN: Set target of last hit to #"+ch+" ("+analyzer.outcomes[ch].label+")");
         }
-      } else { // no learning mode
-        screen.alert("Playing test tone of channel #"+ch);
-        // input.axis_dim[ch].play_your_tone(127,ch);
+      } else { // no Bayesian mode
+        screen.alert("Playing test tone of axis #"+ch);
         analyzer.outcomes[ch].play_your_tone(127); //,ch);
       }
     }
@@ -145,17 +155,17 @@ void keyPressed() {
         screen.alert("Wrote recorded hits to file.");
         break;
       case 'l':
-        if( load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
+        if( BAYESIAN_MODE_ENABLED && load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
           screen.alert("Loaded recorded hits from file.");
         } else {
           screen.alert("Error: Failed to load hits from file.");
         }
         break;
       case 'z':
-        if( LEARNING_MODE_ENABLED ) {
+        if( BAYESIAN_MODE_ENABLED ) {
           if( analyzer.learn_based_on_recorded_hits() ) {
             currently_in_recording_phase = false;
-            screen.alert("Bayesian models completed.");
+            screen.alert("Bayesian models computed.");
           } else {
             screen.alert("Bayesian models could not be completed.");
           }
@@ -167,13 +177,15 @@ void keyPressed() {
           "- lower threshold\n"+
           "h print this help message\n"+
           "r reset input buffer\n"+
-          "w write recorded hits to disk\n"+
           "d print debug info\n"+
           "ESC quit\n";
-        if(LEARNING_MODE_ENABLED) {
-          help_message += "(0-9) assign target channel to last hit\nz end learning mode and define Bayesian models (!)";
+        if( BAYESIAN_MODE_ENABLED ) {
+          help_message += "(0-9) assign target channel to last hit\n" +
+            "w write recorded hits to disk\n"+
+            "l load recorded hits from disk\n"+
+            "z end learning mode and define Bayesian models (!)";
         } else {
-          help_message += "(0-9) play test tone of outcome";
+          help_message += "(0-9) play test tone of axis";
         }        
         screen.alert(help_message);
         break;
@@ -192,9 +204,11 @@ boolean test_setup() {
   if(SIGNAL_GROUP_OF_OUTCOME.length != OUTCOMES_LABEL.length) { println("test_setup: error #2!"); all_fine = false; }
   if(LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS > LENGTH_OF_PAST_VALUES) { println("test_setup: error #3!"); all_fine = false; }
   if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #4!"); all_fine = false; }
+
+  if( !BAYESIAN_MODE_ENABLED && NUMBER_OF_SIGNALS != OUTCOMES_LABEL.length ) { println("test_setup: error #5!"); all_fine = false; }
   
   for(int oo=0; oo<OUTCOMES_LABEL.length; oo++) {
-    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #5!"); all_fine = false; }
+    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #6!"); all_fine = false; }
   }
   
   return all_fine;

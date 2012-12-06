@@ -17,21 +17,14 @@ class MovementAnalyzer {
     int relevant_events_count;
     float mean_here, stddev_here;
     boolean all_models_could_be_learned = true;
-    if(!LEARNING_MODE_ENABLED) {
+    if(!BAYESIAN_MODE_ENABLED) {
       println("Warning: Learning mode disabled, so MovementAnalyzer#learn_based_on_recorded_hits() cannot work!");
       return false;
     }
 
-    // println("DEBUG: collection:");
-    // for (int events_index=0; events_index<collectedHits.length; events_index++) {
-    //   println(" - event #"+events_index+" has target outcome "+collectedHits[events_index].target_outcome);
-    // }
-    // println(" --- end collection ---");
-    
     for(int oo=0; oo<this.outcomes.length; oo++) {
       for (int time_lag=0; time_lag<LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS; time_lag++) {
         for (int axis_index=0; axis_index<NUMBER_OF_SIGNALS; axis_index++) {
-          // temp_detection_vector = new float[0];
           relevant_events_count = 0;
           for (int events_index=0; events_index<collectedHits.length; events_index++) {
             if(relevant_events_count < MAX_NUMBER_OF_EVENTS_FOR_LEARNING) {
@@ -49,7 +42,6 @@ class MovementAnalyzer {
             outcomes[oo].std_target_move[axis_index][time_lag] = stddev_here;
             // println("DEBUG: learned something for outcome #"+oo+" ("+outcomes[oo].label+") and axis #"+axis_index+" and time lag "+time_lag+": mean "+mean_here+", std. "+stddev_here);
           } else {
-            // println("DEBUG: could not learn, not enough data.");
             all_models_could_be_learned = false;
           }
         }
@@ -71,7 +63,7 @@ class MovementAnalyzer {
     int most_likely_outcome = NULL_OUTCOME_FOR_SIGNAL_GROUP[triggering_signal_group];
     float highest_log_probability = -0.5*Float.MAX_VALUE;
     float log_probability;
-    for(int oo=2; oo<this.outcomes.length; oo++) { //                              <----- HACK
+    for(int oo=2; oo<this.outcomes.length; oo++) { //                              <----- HACK to skip null events
       if(this.outcomes[oo].associated_signal_group == triggering_signal_group) {
         log_probability = this.outcomes[oo].compute_bayesian_log_probability();
         if( log_probability > highest_log_probability ) {

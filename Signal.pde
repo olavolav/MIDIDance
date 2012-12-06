@@ -24,9 +24,6 @@ class Signal {
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k], SIGNAL_GROUP_OF_AXIS[k]);
-
-      // assign axis to groups (left and right hand)
-      // axis_dim[k].signal_group = k/3; // HACK! for 3 axis on each controller
     }
     
     if (!simulation) {
@@ -104,12 +101,17 @@ class Signal {
           analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[signal_group_of_max_velocity]].play_your_tone(1.9);
         }
         else { // after recording phase
-          int most_likely_outcome = analyzer.detect( signal_group_of_max_velocity );
+          int most_likely_outcome = -1;
+          if( BAYESIAN_MODE_ENABLED ) {
+            most_likely_outcome = analyzer.detect( signal_group_of_max_velocity );
+          } else { // if in old linear mode
+            most_likely_outcome = axis_of_max_velocity;
+          }
           if( most_likely_outcome >= 0 ) {
             analyzer.outcomes[most_likely_outcome].play_your_tone(1.9); //max_velocity);
           }
           screen.alert("shake: outcome #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
-          println("shake: likely outcome is #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
+          println("shake: outcome is #"+most_likely_outcome+" ("+analyzer.outcomes[most_likely_outcome].label+")");
         }
         
         played_a_tone = true;
