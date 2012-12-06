@@ -45,8 +45,6 @@ int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 1;
 int NUMBER_OF_SIGNALS = 6;
-boolean DO_SIGNAL_REWIRING = false;
-int[] SIGNAL_REWIRING = {3,4,5,0,1,2}; // swap controllers!
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
 float INIT_SECONDS = 12.;
@@ -193,11 +191,10 @@ boolean test_setup() {
   if(SIGNAL_GROUP_OF_AXIS.length != NUMBER_OF_SIGNALS) { println("test_setup: error #1!"); all_fine = false; }
   if(SIGNAL_GROUP_OF_OUTCOME.length != OUTCOMES_LABEL.length) { println("test_setup: error #2!"); all_fine = false; }
   if(LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS > LENGTH_OF_PAST_VALUES) { println("test_setup: error #3!"); all_fine = false; }
-  if(DO_SIGNAL_REWIRING) { println("test_setup: error #4!"); all_fine = false; } // not implemented yet
-  if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #5!"); all_fine = false; }
+  if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #4!"); all_fine = false; }
   
   for(int oo=0; oo<OUTCOMES_LABEL.length; oo++) {
-    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #6!"); all_fine = false; }
+    if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #5!"); all_fine = false; }
   }
   
   return all_fine;

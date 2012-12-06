@@ -171,17 +171,6 @@ class Signal {
           }
         }
 
-        if (DO_SIGNAL_REWIRING) {
-          for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-            tempValues[k] = axis_dim[k].value;
-            axis_dim[k].value = 0;
-          }
-          for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-            if(SIGNAL_REWIRING[k] >= 0)
-              axis_dim[SIGNAL_REWIRING[k]].value += abs(tempValues[k]);
-          }
-        }
-
         // remove characters from inBuffer
         inBuffer = inBuffer.substring(0,m.start(0)) + inBuffer.substring(m.end(0),inBuffer.length());
       }
