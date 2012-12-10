@@ -8,6 +8,7 @@ class Display {
   
   void update_value_display() {
     String label;
+    textSize(20);
     textAlign(LEFT, CENTER);
     for(int j=0; j<NUMBER_OF_SIGNALS; j++) {
       label = AXIS_LABELS[j%(AXIS_LABELS.length)];
@@ -27,6 +28,11 @@ class Display {
       line(this.rolling, round(height*input.axis_dim[j].normalized_old_value()), this.rolling+ROLLING_INCREMENT,
         round(height*input.axis_dim[j].normalized_value()));
     }
+  }
+  
+  void draw_vertical_line(int axis_nr) {
+    stroke( line_color(axis_nr), 200 );
+    line( this.rolling+ROLLING_INCREMENT,0,this.rolling+ROLLING_INCREMENT,height);
   }
   
   void simple_blenddown(int alpha) {

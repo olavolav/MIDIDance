@@ -92,8 +92,7 @@ class Signal {
       }
       if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(signal_group_of_max_velocity)) {
         // hit!
-        stroke(line_color(axis_of_max_velocity), 200);
-        line(screen.rolling+ROLLING_INCREMENT,0,screen.rolling+ROLLING_INCREMENT,height);
+        screen.draw_vertical_line( axis_of_max_velocity );
 
         if( currently_in_recording_phase ) {
           screen.alert("recording shake: axis #"+axis_of_max_velocity);
