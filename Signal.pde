@@ -133,8 +133,6 @@ class Signal {
       this.read_input_line = this.myPort.readString();
       this.inBuffer = this.inBuffer+this.read_input_line;
       lines_read++;
-      if( millis() - this.time_of_first_signal_MS > 500.0 ) { screen.alert("signal lost!"); }
-      if( this.read_input_line.trim() != "" ) { this.time_of_first_signal_MS = millis(); }
     } else {
       this.inBuffer = "(simulation)";
       this.lines_read++;
