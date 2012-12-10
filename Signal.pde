@@ -10,8 +10,7 @@ class Signal {
   Axis[] axis_dim;
   int nr_groups = 2;
   float xthresh = 0.3;
-  int lines_read;
-  int numbers_read = 0;
+  int lines_read, numbers_read;
   boolean last_time_we_extracted_a_number = false;
   float time_of_first_signal_MS = -1.0;
   String read_input_line;
@@ -35,10 +34,11 @@ class Signal {
       } else {
         println("-> done.");
       }
-      lines_read = 0;
     } else {
       println("Simulating serial input...");
     }
+    lines_read = 0;
+    numbers_read = 0;
   }
   
   void clear_buffer() {
@@ -207,9 +207,8 @@ class Signal {
   }
   
   float rate_of_signal_per_axis_Hz() {
-    if(this.time_of_first_signal_MS < 0.0 || this.lines_read == 0) {
-      return 0.0;
-    }
+    if( this.time_of_first_signal_MS < 0.0 || this.lines_read == 0 )
+      { return 0.0; }
     return (this.numbers_read/this.axis_dim.length) / ((millis() - this.time_of_first_signal_MS)/1000.0);
   }
 
