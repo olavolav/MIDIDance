@@ -42,18 +42,21 @@ int last_displayed_second_init, current_second_init;
 // int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
 // int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
 // int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
+// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
 
 // Option A-2) The Bayesian movement analyzer (1x Nunchuck):
 boolean BAYESIAN_MODE_ENABLED = true;
 String[] OUTCOMES_LABEL = { "null", "left", "up","right" };
 int[] MIDI_PITCH_CODES =  { -1, 52, 57, 40 };
 int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
+boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
 
 // Option B) The velocity threshold analyzer:
 // boolean BAYESIAN_MODE_ENABLED = false;
 // String[] OUTCOMES_LABEL = AXIS_LABELS;
 // int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
 // int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
+// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false, false, false, false};
 
 // The general analyzer paramters:
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
@@ -216,6 +219,12 @@ boolean test_setup() {
   
   for(int oo=0; oo<OUTCOMES_LABEL.length; oo++) {
     if(SIGNAL_GROUP_OF_OUTCOME[oo] < 0) { println("test_setup: error #6!"); all_fine = false; }
+  }
+  
+  if(BAYESIAN_MODE_ENABLED) {
+    if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR.length != OUTCOMES_LABEL.length ) {
+      println("test_setup: error #7!"); all_fine = false;
+    }
   }
   
   return all_fine;

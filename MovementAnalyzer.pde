@@ -1,4 +1,3 @@
-
 class MovementAnalyzer {
   
   MovementOutcome[] outcomes;
@@ -64,16 +63,18 @@ class MovementAnalyzer {
     int most_likely_outcome = NULL_OUTCOME_FOR_SIGNAL_GROUP[triggering_signal_group];
     float highest_log_probability = -0.5*Float.MAX_VALUE;
     float log_probability;
-    for(int oo=1; oo<this.outcomes.length; oo++) { //                              <----- HACK to skip null events
-      if(this.outcomes[oo].associated_signal_group == triggering_signal_group) {
-        log_probability = this.outcomes[oo].compute_bayesian_log_probability( event );
-        if( log_probability > highest_log_probability ) {
-          highest_log_probability = log_probability;
-          most_likely_outcome = oo;
+    for(int oo=0; oo<this.outcomes.length; oo++) {
+      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[oo] == false ) {
+        if(this.outcomes[oo].associated_signal_group == triggering_signal_group) {
+          log_probability = this.outcomes[oo].compute_bayesian_log_probability( event );
+          if( log_probability > highest_log_probability ) {
+            highest_log_probability = log_probability;
+            most_likely_outcome = oo;
+          }
         }
       }
     }
-    println("DEBUG: MovementAnalyzer#detect(): Most likely outcome = "+most_likely_outcome);
+    println("DEBUG: MovementAnalyzer#detect: Most likely outcome = "+most_likely_outcome);
     return most_likely_outcome;
   }
   
@@ -82,8 +83,8 @@ class MovementAnalyzer {
     int correct_hits = 0;
     if( collectedHits.length == 0 ) { return 0.0; }
     for(int h=0; h<collectedHits.length; h++) {
-      // TODO: if it is not a null signal
-      if( collectedHits[h].target_outcome > 0 ) {
+      // if target_outcome is not a null signal
+      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[collectedHits[h].target_outcome] == false ) {
         println("DEBUG in detect_accuracy_of_all_prerecorded_hits: target outcome of hit #"+h+" is #"+collectedHits[h].target_outcome);
         relevant_hits++;
         if( collectedHits[h].target_outcome == this.detect( SIGNAL_GROUP_OF_OUTCOME[collectedHits[h].target_outcome], collectedHits[h]) ) {
@@ -96,17 +97,7 @@ class MovementAnalyzer {
     }
     return float(correct_hits)/float(relevant_hits);
   }
-  
-  boolean load_target_movements_from_file() {
-    println("Warning: MovementAnalyzer#load_target_movements_from_file() is not implemented yet!");
-    return false;
-  }
-
-  boolean save_target_movements_to_file() {
-    println("Warning: MovementAnalyzer#save_target_movements_to_file() is not implemented yet!");
-    return false;
-  }
-  
+    
   String status_of_recorded_hits_per_outcome() {
     String status = "";
     int[] counter_outcome = new int[this.outcomes.length];
