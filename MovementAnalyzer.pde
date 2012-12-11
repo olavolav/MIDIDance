@@ -59,13 +59,14 @@ class MovementAnalyzer {
     return StatisticsTools__standard_deviation(temp_detection_vector, 0, count-1);
   }
   
-  int detect(int triggering_signal_group) {
+  int detect(int triggering_signal_group) { return this.detect(triggering_signal_group, null); }
+  int detect(int triggering_signal_group, Hit event) {
     int most_likely_outcome = NULL_OUTCOME_FOR_SIGNAL_GROUP[triggering_signal_group];
     float highest_log_probability = -0.5*Float.MAX_VALUE;
     float log_probability;
-    for(int oo=2; oo<this.outcomes.length; oo++) { //                              <----- HACK to skip null events
+    for(int oo=1; oo<this.outcomes.length; oo++) { //                              <----- HACK to skip null events
       if(this.outcomes[oo].associated_signal_group == triggering_signal_group) {
-        log_probability = this.outcomes[oo].compute_bayesian_log_probability();
+        log_probability = this.outcomes[oo].compute_bayesian_log_probability( event );
         if( log_probability > highest_log_probability ) {
           highest_log_probability = log_probability;
           most_likely_outcome = oo;
@@ -74,6 +75,26 @@ class MovementAnalyzer {
     }
     println("DEBUG: MovementAnalyzer#detect(): Most likely outcome = "+most_likely_outcome);
     return most_likely_outcome;
+  }
+  
+  float detect_accuracy_of_all_prerecorded_hits() {
+    int relevant_hits = 0;
+    int correct_hits = 0;
+    if( collectedHits.length == 0 ) { return 0.0; }
+    for(int h=0; h<collectedHits.length; h++) {
+      // TODO: if it is not a null signal
+      if( collectedHits[h].target_outcome > 0 ) {
+        println("DEBUG in detect_accuracy_of_all_prerecorded_hits: target outcome of hit #"+h+" is #"+collectedHits[h].target_outcome);
+        relevant_hits++;
+        if( collectedHits[h].target_outcome == this.detect( SIGNAL_GROUP_OF_OUTCOME[collectedHits[h].target_outcome], collectedHits[h]) ) {
+          // println("DEBUG in detect_accuracy_of_all_prerecorded_hits: hit #"+h+" would be correctly identified.");
+          correct_hits++;
+        } else {
+          println("DEBUG in detect_accuracy_of_all_prerecorded_hits: hit #"+h+" would be incorrectly identified.");
+        }
+      }
+    }
+    return float(correct_hits)/float(relevant_hits);
   }
   
   boolean load_target_movements_from_file() {
