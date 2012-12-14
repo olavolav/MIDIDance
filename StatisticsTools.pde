@@ -37,8 +37,11 @@ float StatisticsTools__variance(float[] data, int start_index, int end_index) {
     }
   }
   if( all_identical ) {
-    println("error in StatisticsTools__variance: variance of vector is zero!");
-    exit();
+    // println("error in StatisticsTools__variance: variance of vector is zero!");
+    // exit();
+    // Variance zero happens too frequently, we instead return a negative number:
+    println("Warning in StatisticsTools__variance: variance of vector is zero!");
+    return -1.0;
   }
   
   float mean = StatisticsTools__mean(data, start_index, end_index);

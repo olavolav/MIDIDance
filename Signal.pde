@@ -9,7 +9,7 @@ class Signal {
   Pattern input_text_pattern;
   Axis[] axis_dim;
   int nr_groups = 2;
-  float xthresh = 0.3;
+  float xthresh = 0.2;
   int lines_read, numbers_read;
   boolean last_time_we_extracted_a_number = false;
   float time_of_first_signal_MS = -1.0;
@@ -18,7 +18,8 @@ class Signal {
   
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
-    input_text_pattern = Pattern.compile("\\s*-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s+");
+    // input_text_pattern = Pattern.compile("\\s*-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s+");
+    input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1+1)+"}-?[0-9]+>\\s*");
     axis_dim = new Axis[NUMBER_OF_SIGNALS];
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
@@ -100,7 +101,7 @@ class Signal {
           analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[signal_group_of_max_velocity]].play_your_tone(1.9);
         }
         else { // after recording phase
-          int most_likely_outcome = -1;
+          int most_likely_outcome;
           if( BAYESIAN_MODE_ENABLED ) {
             most_likely_outcome = analyzer.detect( signal_group_of_max_velocity );
           } else { // if in old linear mode
@@ -150,32 +151,34 @@ class Signal {
       if (m.find()) {
         found_a_number = true;
         s = m.group(0).trim();
-        s_split = s.trim().split(",");
-
-        if(s_split.length != NUMBER_OF_SIGNALS) {
-          println("DEBUG: Invalid pattern, clearing input buffer!");
-          inBuffer = "";
-        }
+        // remove leading and trailing bracket
+        s = s.substring(1, s.length() - 1);
+        s_split = s.split(",");
 
         if(lines_read > NUMBER_OF_LINES_TO_SKIP_ON_INIT) {
-          for(int t=0; t<s_split.length; t++) {
-            this.axis_dim[t].value = int(s_split[t].trim());
-            this.numbers_read++;
-            
-            // DEBUG
-            if(this.axis_dim[t].value > 900) {
-              print("DEBUG: large number! inBuffer = "+this.inBuffer);
+          // first, checksum test
+          int sum = 0;
+          for(int t=0; t<s_split.length-1; t++) { sum += int(s_split[t].trim()); }
+          if( sum == int(s_split[s_split.length-1].trim()) ) {
+            // passed checksum test
+            for(int t=0; t<s_split.length-1; t++) {
+              this.axis_dim[t].value = int(s_split[t].trim());
+              sum += this.axis_dim[t].value;
+              this.numbers_read++;
             }
+          } else {
+            println("DEBUG: Numbers failed checksum test, ignoring line.");
           }
         }
 
         // remove characters from inBuffer
         inBuffer = inBuffer.substring(0,m.start(0)) + inBuffer.substring(m.end(0),inBuffer.length());
+        inBuffer = inBuffer.trim();
       }
     }
     else { // if simulated signal
       for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-        axis_dim[k].value = round((10*k+lines_read)%height);
+        axis_dim[k].value = round((10*k+lines_read)%height + random(0,10));
         this.numbers_read++;
       }
       found_a_number = !last_time_we_extracted_a_number;  // HACK

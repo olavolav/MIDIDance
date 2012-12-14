@@ -22,26 +22,29 @@ class MovementAnalyzer {
     }
 
     for(int oo=0; oo<this.outcomes.length; oo++) {
-      for (int time_lag=0; time_lag<LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS; time_lag++) {
-        for (int axis_index=0; axis_index<NUMBER_OF_SIGNALS; axis_index++) {
-          relevant_events_count = 0;
-          for (int events_index=0; events_index<collectedHits.length; events_index++) {
-            if(relevant_events_count < MAX_NUMBER_OF_EVENTS_FOR_LEARNING) {
-              if(collectedHits[events_index].target_outcome == oo) {
-                temp_detection_vector[relevant_events_count] = collectedHits[events_index].value_history[axis_index][time_lag];
-                relevant_events_count++;
+      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[oo] == false ) {
+        for (int time_lag=0; time_lag<LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS; time_lag++) {
+          for (int axis_index=0; axis_index<NUMBER_OF_SIGNALS; axis_index++) {
+            relevant_events_count = 0;
+            for (int events_index=0; events_index<collectedHits.length; events_index++) {
+              if(relevant_events_count < MAX_NUMBER_OF_EVENTS_FOR_LEARNING) {
+                if(collectedHits[events_index].target_outcome == oo) {
+                  temp_detection_vector[relevant_events_count] = collectedHits[events_index].value_history[axis_index][time_lag];
+                  relevant_events_count++;
+                }
               }
             }
-          }
-          if( relevant_events_count >= 2) {
-            mean_here = this.__calculate_average_of_detection_vector(relevant_events_count);
-            stddev_here = this.__calculate_standard_deviation_of_detection_vector(relevant_events_count);
-            outcomes[oo].has_been_learned = true;
-            outcomes[oo].avg_target_move[axis_index][time_lag] = mean_here;
-            outcomes[oo].std_target_move[axis_index][time_lag] = stddev_here;
-            // println("DEBUG: learned something for outcome #"+oo+" ("+outcomes[oo].label+") and axis #"+axis_index+" and time lag "+time_lag+": mean "+mean_here+", std. "+stddev_here);
-          } else {
-            all_models_could_be_learned = false;
+            if( relevant_events_count >= 2) {
+              mean_here = this.__calculate_average_of_detection_vector(relevant_events_count);
+              stddev_here = this.__calculate_standard_deviation_of_detection_vector(relevant_events_count);
+              if( stddev_here < 0.0 ) { all_models_could_be_learned = false; }
+              outcomes[oo].has_been_learned = true;
+              outcomes[oo].avg_target_move[axis_index][time_lag] = mean_here;
+              outcomes[oo].std_target_move[axis_index][time_lag] = stddev_here;
+              // println("DEBUG: learned something for outcome #"+oo+" ("+outcomes[oo].label+") and axis #"+axis_index+" and time lag "+time_lag+": mean "+mean_here+", std. "+stddev_here);
+            } else {
+              all_models_could_be_learned = false;
+            }
           }
         }
       }

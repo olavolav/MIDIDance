@@ -11,7 +11,7 @@
 
 void setup()
 {
-  Serial.begin(19200);
+  Serial.begin(57600);
   nunchuck_setpowerpins(); // use analog pins 2&3 as fake gnd & pwr
   nunchuck_init(); // send the initilization handshake
   Serial.print ("Finished setup\n");
@@ -21,7 +21,7 @@ void loop()
 {
   nunchuck_get_data();
   nunchuck_print_data();
-  delay(100);
+  delay(10);
 }
 
 
@@ -93,6 +93,7 @@ void nunchuck_print_data()
   int accel_x_axis = nunchuck_buf[2]; // * 2 * 2; 
   int accel_y_axis = nunchuck_buf[3]; // * 2 * 2;
   int accel_z_axis = nunchuck_buf[4]; // * 2 * 2;
+  int checksum = accel_x_axis + accel_y_axis + accel_z_axis;
 
 //  int z_button = 0;
 //  int c_button = 0;
@@ -130,11 +131,16 @@ void nunchuck_print_data()
 //  Serial.print("  \t");
 
 //  Serial.print("acc:");
+  Serial.print("<");
   Serial.print(accel_x_axis, DEC);
   Serial.print(",");
   Serial.print(accel_y_axis, DEC);
   Serial.print(",");
   Serial.print(accel_z_axis, DEC);
+  // Finish by adding the sum as a crude "checksum"
+  Serial.print(",");
+  Serial.print(checksum, DEC);
+  Serial.print(">");
 //  Serial.print("\t");
 
 //  Serial.print("but:");
@@ -153,4 +159,3 @@ char nunchuk_decode_byte (char x)
   x = (x ^ 0x17) + 0x17;
   return x;
 }
-
