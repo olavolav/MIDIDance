@@ -11,7 +11,10 @@ int valOnez = 0;
 int valTwox = 0;
 int valTwoy = 0;
 int valTwoz = 0;
-//int valtotal = 0;
+int checksumOne = 0;
+int checksumTwo = 0;
+int sensorLabelOne = 1;
+int sensorLabelTwo = 1;
 
 void setup () {
   Serial.begin(9600);
@@ -25,14 +28,16 @@ void loop() {
   valTwoy =analogRead(accTwoyPin);
   valTwoz = analogRead(accTwozPin);
 
- // valtotal = valx+valy+valz;
+ checksumOne = valOnex+valOney+valOnez;
+ checksumTwo = valTwox+valTwoy+valTwoz;
  String valOnexstring = String(valOnex,DEC);
  String valOneystring = String(valOney,DEC);
  String valOnezstring = String(valOnez,DEC);
  String valTwoxstring = String(valTwox,DEC);
  String valTwoystring = String(valTwoy,DEC);
  String valTwozstring = String(valTwoz,DEC);
- Serial.println(valOnexstring + "," + valOneystring + "," + valOnezstring + "," +valTwoxstring + "," + valTwoystring + "," + valTwozstring);
+ Serial.println("<" + sensorLabelOne + "," + valOnexstring + "," + valOneystring + "," + valOnezstring + "," + checksumOne + ">"); 
+ Serial.println("<" + sensorLabelTwo + "," + valTwoxstring + "," + valTwoystring + "," + valTwozstring + "," + checksumTwo + ">"); 
 // Serial.println(valx,DEC)
 // print(",")
 //  Serial.print(valy,DEC)

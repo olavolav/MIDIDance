@@ -21,7 +21,7 @@ void loop()
 {
   nunchuck_get_data();
   nunchuck_print_data();
-  delay(10);
+  delay(100);
 }
 
 
@@ -36,10 +36,8 @@ static void nunchuck_setpowerpins()
 {
 #define pwrpin PORTC3
 #define gndpin PORTC2
-#define gndpin2 PORTC1
-    DDRC |= _BV(pwrpin) | _BV(gndpin) | _BV(gndpin2);
+    DDRC |= _BV(pwrpin) | _BV(gndpin);
     PORTC &=~ _BV(gndpin);
-    PORTC &=~ _BV(gndpin2);
     PORTC |=  _BV(pwrpin);
     delay(100);  // wait for things to stabilize        
 }
@@ -89,14 +87,12 @@ int nunchuck_get_data()
 // multiply them by 2 * 2
 void nunchuck_print_data()
 { 
-  int xbeeNUMBER=2; 
 //  static int i=0;
 //  int joy_x_axis = nunchuck_buf[0];
 //  int joy_y_axis = nunchuck_buf[1];
   int accel_x_axis = nunchuck_buf[2]; // * 2 * 2; 
   int accel_y_axis = nunchuck_buf[3]; // * 2 * 2;
   int accel_z_axis = nunchuck_buf[4]; // * 2 * 2;
-  int checksum = accel_x_axis + accel_y_axis + accel_z_axis+ xbeeNUMBER;
 
 //  int z_button = 0;
 //  int c_button = 0;
@@ -134,20 +130,11 @@ void nunchuck_print_data()
 //  Serial.print("  \t");
 
 //  Serial.print("acc:");
- Serial.println("<" + xbeeNUMBER + "," + accel_x_axis + "," + accel_y_axis + "," + accel_z_axis + "," + checksum + ">", DEC); 
-
-//  Serial.print("<");
-//  Serial.print(xbeeNUMBER, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_x_axis, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_y_axis, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_z_axis, DEC);
-//  // Finish by adding the sum as a crude "checksum"
-//  Serial.print(",");
-//  Serial.print(checksum, DEC);
-//  Serial.print(">");
+  Serial.print(accel_x_axis, DEC);
+  Serial.print(",");
+  Serial.print(accel_y_axis, DEC);
+  Serial.print(",");
+  Serial.print(accel_z_axis, DEC);
 //  Serial.print("\t");
 
 //  Serial.print("but:");
@@ -166,3 +153,4 @@ char nunchuk_decode_byte (char x)
   x = (x ^ 0x17) + 0x17;
   return x;
 }
+

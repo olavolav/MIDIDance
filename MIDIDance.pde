@@ -14,21 +14,22 @@ Tone[] activeTones = new Tone[0];
 int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1";
 // String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
-String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+//String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+String MIDI_DEVICE_NAME = "LoopBe Internal MIDI";
 
 boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-int NUMBER_OF_SIGNALS = 3;
+int NUMBER_OF_SIGNALS = 6;
 boolean SIMULATE_SERIAL_INPUT = false;
 int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 int SERIAL_PORT_NUMBER = 0;
-int SERIAL_PORT_BAUD_RATE = 2*9600;
+int SERIAL_PORT_BAUD_RATE = 6*9600;
 Signal input;
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
-int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
+int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 int LENGTH_OF_PAST_VALUES = 30;
 
 // The display:
@@ -37,12 +38,12 @@ String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 int last_displayed_second_init, current_second_init;
 
 // Option A-1) The Bayesian movement analyzer (2x accelerometer):
-// boolean BAYESIAN_MODE_ENABLED = true;
-// String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
-// int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
+//boolean BAYESIAN_MODE_ENABLED = true;
+//String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
+//int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
+//int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
+//int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
+//boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
 
 // Option A-2) The Bayesian movement analyzer (1x Nunchuck):
 boolean BAYESIAN_MODE_ENABLED = true;
@@ -52,18 +53,18 @@ int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
 boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
 
 // Option B) The velocity threshold analyzer:
-// boolean BAYESIAN_MODE_ENABLED = false;
-// String[] OUTCOMES_LABEL = AXIS_LABELS;
-// int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false, false, false, false};
+ //boolean BAYESIAN_MODE_ENABLED = false;
+ //String[] OUTCOMES_LABEL = AXIS_LABELS;
+ //int[] MIDI_PITCH_CODES =  { 40, 41, 52};//, 57, 40, 38}; // if Bayesian is disabled
+ //int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0};//, 0};
+ //boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false};//, false, false, false};
 
 // The general analyzer paramters:
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
 boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
-int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 10;
+int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 3*10;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
