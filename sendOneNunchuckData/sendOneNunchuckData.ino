@@ -89,7 +89,7 @@ int nunchuck_get_data()
 // multiply them by 2 * 2
 void nunchuck_print_data()
 { 
-  int xbeeNUMBER=2; 
+  int xbeeNUMBER=1; 
 //  static int i=0;
 //  int joy_x_axis = nunchuck_buf[0];
 //  int joy_y_axis = nunchuck_buf[1];
@@ -157,7 +157,7 @@ Serial.println(">");
 //  Serial.print(",");
 //  Serial.print(c_button, DEC);
 
-  Serial.print("\r\n");  // newline
+  //Serial.print("\r\n");  // newline
 //  i++;
 }
 
