@@ -36,8 +36,10 @@ static void nunchuck_setpowerpins()
 {
 #define pwrpin PORTC3
 #define gndpin PORTC2
-    DDRC |= _BV(pwrpin) | _BV(gndpin);
+#define gndpin2 PORTC1
+    DDRC |= _BV(pwrpin) | _BV(gndpin) | _BV(gndpin2);
     PORTC &=~ _BV(gndpin);
+    PORTC &=~ _BV(gndpin2);
     PORTC |=  _BV(pwrpin);
     delay(100);  // wait for things to stabilize        
 }
@@ -87,13 +89,14 @@ int nunchuck_get_data()
 // multiply them by 2 * 2
 void nunchuck_print_data()
 { 
+  int xbeeNUMBER=1; 
 //  static int i=0;
 //  int joy_x_axis = nunchuck_buf[0];
 //  int joy_y_axis = nunchuck_buf[1];
   int accel_x_axis = nunchuck_buf[2]; // * 2 * 2; 
   int accel_y_axis = nunchuck_buf[3]; // * 2 * 2;
   int accel_z_axis = nunchuck_buf[4]; // * 2 * 2;
-  int checksum = accel_x_axis + accel_y_axis + accel_z_axis;
+  int checksum = accel_x_axis + accel_y_axis + accel_z_axis+ xbeeNUMBER;
 
 //  int z_button = 0;
 //  int c_button = 0;
@@ -131,16 +134,22 @@ void nunchuck_print_data()
 //  Serial.print("  \t");
 
 //  Serial.print("acc:");
-  Serial.print("<");
-  Serial.print(accel_x_axis, DEC);
-  Serial.print(",");
-  Serial.print(accel_y_axis, DEC);
-  Serial.print(",");
-  Serial.print(accel_z_axis, DEC);
-  // Finish by adding the sum as a crude "checksum"
-  Serial.print(",");
-  Serial.print(checksum, DEC);
-  Serial.print(">");
+ //Serial.println("<");
+//Serial.println(xbeeNUMBER,DEC) + "," + accel_x_axis + "," + accel_y_axis + "," + accel_z_axis + "," + checksum + ">", DEC); 
+
+Serial.print("<");
+Serial.print(xbeeNUMBER, DEC);
+Serial.print(",");
+Serial.print(accel_x_axis, DEC);
+Serial.print(",");
+Serial.print(accel_y_axis, DEC);
+Serial.print(",");
+Serial.print(accel_z_axis, DEC);
+
+//  // Finish by adding the sum as a crude "checksum"
+Serial.print(",");
+Serial.print(checksum, DEC);
+Serial.println(">");
 //  Serial.print("\t");
 
 //  Serial.print("but:");
@@ -148,7 +157,7 @@ void nunchuck_print_data()
 //  Serial.print(",");
 //  Serial.print(c_button, DEC);
 
-  Serial.print("\r\n");  // newline
+  //Serial.print("\r\n");  // newline
 //  i++;
 }
 
