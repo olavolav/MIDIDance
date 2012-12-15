@@ -82,22 +82,44 @@ class MovementAnalyzer {
   }
   
   float detect_accuracy_of_all_prerecorded_hits() {
+    int[] relevant_for_this = new int[this.outcomes.length];
+    int[] correct_for_this = new int[this.outcomes.length];
+    for (int oo=0; oo<this.outcomes.length; oo++) {
+      relevant_for_this[oo] = 0;
+      correct_for_this[oo] = 0;
+    }
     int relevant_hits = 0;
     int correct_hits = 0;
     if( collectedHits.length == 0 ) { return 0.0; }
+    int tt;
     for(int h=0; h<collectedHits.length; h++) {
+      tt = collectedHits[h].target_outcome;
       // if target_outcome is not a null signal
-      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[collectedHits[h].target_outcome] == false ) {
-        println("DEBUG in detect_accuracy_of_all_prerecorded_hits: target outcome of hit #"+h+" is #"+collectedHits[h].target_outcome);
+      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[tt] == false ) {
+        // println("DEBUG in detect_accuracy_of_all_prerecorded_hits: target outcome of hit #"+h+" is #"+tt);
         relevant_hits++;
-        if( collectedHits[h].target_outcome == this.detect( SIGNAL_GROUP_OF_OUTCOME[collectedHits[h].target_outcome], collectedHits[h]) ) {
+        relevant_for_this[tt]++;
+        if( tt == this.detect( SIGNAL_GROUP_OF_OUTCOME[tt], collectedHits[h]) ) {
           // println("DEBUG in detect_accuracy_of_all_prerecorded_hits: hit #"+h+" would be correctly identified.");
           correct_hits++;
+          correct_for_this[tt]++;
         } else {
-          println("DEBUG in detect_accuracy_of_all_prerecorded_hits: hit #"+h+" would be incorrectly identified.");
+          // println("DEBUG in detect_accuracy_of_all_prerecorded_hits: hit #"+h+" would be incorrectly identified.");
         }
       }
     }
+    
+    println("DEBUG: Learning performance overview:");
+    for (int oo=0; oo<this.outcomes.length; oo++) {
+      print(" - outcome #"+oo+" ("+this.outcomes[oo].label+"): ");
+      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[oo] == false ) {
+        print( (100.0*float(correct_for_this[oo])/float(relevant_for_this[oo]))+"%" );
+        println( " (based on "+relevant_for_this[oo]+" target hits)");
+      } else {
+        println("skipped.");
+      }
+    }
+    
     return float(correct_hits)/float(relevant_hits);
   }
     
