@@ -134,20 +134,22 @@ void nunchuck_print_data()
 //  Serial.print("  \t");
 
 //  Serial.print("acc:");
- Serial.println("<" + xbeeNUMBER + "," + accel_x_axis + "," + accel_y_axis + "," + accel_z_axis + "," + checksum + ">", DEC); 
+ //Serial.println("<");
+//Serial.println(xbeeNUMBER,DEC) + "," + accel_x_axis + "," + accel_y_axis + "," + accel_z_axis + "," + checksum + ">", DEC); 
 
-//  Serial.print("<");
-//  Serial.print(xbeeNUMBER, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_x_axis, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_y_axis, DEC);
-//  Serial.print(",");
-//  Serial.print(accel_z_axis, DEC);
+Serial.print("<");
+Serial.print(xbeeNUMBER, DEC);
+Serial.print(",");
+Serial.print(accel_x_axis, DEC);
+Serial.print(",");
+Serial.print(accel_y_axis, DEC);
+Serial.print(",");
+Serial.print(accel_z_axis, DEC);
+
 //  // Finish by adding the sum as a crude "checksum"
-//  Serial.print(",");
-//  Serial.print(checksum, DEC);
-//  Serial.print(">");
+Serial.print(",");
+Serial.print(checksum, DEC);
+Serial.println(">");
 //  Serial.print("\t");
 
 //  Serial.print("but:");
