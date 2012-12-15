@@ -19,8 +19,7 @@ class Signal {
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
     // input_text_pattern = Pattern.compile("\\s*-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s+");
-    //input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1+1)+"}-?[0-9]+>\\s*");
-   input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(4-1+1)+"}-?[0-9]+>\\s*");
+    input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(1+(NUMBER_OF_SIGNALS/2-1)+1)+"}-?[0-9]+>\\s*");
     axis_dim = new Axis[NUMBER_OF_SIGNALS];
     
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
@@ -41,6 +40,12 @@ class Signal {
     }
     lines_read = 0;
     numbers_read = 0;
+  }
+  
+  void shutdown_port() {
+    if(!this.simulation) {
+      this.myPort.stop();
+    }
   }
   
   void clear_buffer() {
@@ -157,25 +162,21 @@ class Signal {
         s_split = s.split(",");
 
         if(lines_read > NUMBER_OF_LINES_TO_SKIP_ON_INIT) {
-          // first, checksum test
+          int[] read_numbers = new int[s_split.length];
+          for(int t=0; t<s_split.length; t++) { read_numbers[t] = int(s_split[t].trim()); }
+          
+          // Identify individual controllers based on the first number in the string
+          int axis_offset = 0;
+          if( read_numbers[0] == 2 && NUMBER_OF_SIGNALS > 3 ) { axis_offset = 3; } // <--- slight hack, but works for now
+          // Checksum test
           int sum = 0;
-          for(int t=0; t<s_split.length-1; t++) { sum += int(s_split[t].trim()); }
-          if( sum == int(s_split[s_split.length-1].trim()) ) {
-            // passed checksum test
-            // 1st entry is which hand (1=> axes 0,1,2, 2=>axes 3,4,5)
-            if (s_split[0]=="1") {
-            //for(int t=0; t<s_split.length-1; t++) {
-              for(int t=1; t<s_split.length-1-3; t++) {
-                this.axis_dim[t].value = int(s_split[t].trim());
-                sum += this.axis_dim[t].value;
-                this.numbers_read++;
-              }
-            } else {
-              for(int t=4; t<s_split.length-1-1; t++) {
-                this.axis_dim[t].value = int(s_split[t].trim());
-                sum += this.axis_dim[t].value;
-                this.numbers_read++;
-              }
+
+          for(int t=0; t<read_numbers.length-1; t++) { sum += read_numbers[t]; }
+          if( sum == read_numbers[read_numbers.length-1] ) {
+            // Passed checksum test
+            for(int t=1; t<read_numbers.length-1; t++) {
+              this.axis_dim[t-1+axis_offset].value = read_numbers[t];
+              this.numbers_read++;
             }
           } else {
             println("DEBUG: Numbers failed checksum test, ignoring line.");
