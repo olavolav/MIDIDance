@@ -14,16 +14,18 @@ class MovementOutcome {
     associated_signal_group = sigg;
     midi_pitch = pitch;
     
-    avg_target_move = new float[NUMBER_OF_SIGNALS][LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS];
-    std_target_move = new float[NUMBER_OF_SIGNALS][LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS];
+    avg_target_move = new float[NUMBER_OF_SIGNALS][LENGTH_OF_PAST_VALUES];
+    std_target_move = new float[NUMBER_OF_SIGNALS][LENGTH_OF_PAST_VALUES];
   }
   
-  float compute_bayesian_log_probability() { return this.compute_bayesian_log_probability(null); }
-  float compute_bayesian_log_probability(Hit event) {
+  float compute_bayesian_log_probability(int bayesian_length) {
+    return this.compute_bayesian_log_probability( null, bayesian_length );
+  }
+  float compute_bayesian_log_probability(Hit event, int bayesian_length) {
     float prior = 1.0;
     float current_value;
     float log_probability = log(prior);
-    for (int time_lag=0; time_lag<LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS; time_lag++) {
+    for (int time_lag=0; time_lag<bayesian_length; time_lag++) {
       for (int axis_index=0; axis_index<NUMBER_OF_SIGNALS; axis_index++) {
         if(input.axis_dim[axis_index].signal_group == this.associated_signal_group) {
           // Compute the posterior probability according to independent normal distributions
@@ -37,7 +39,7 @@ class MovementOutcome {
         }
       }
     }
-    println("DEBUG: log. prob. of signal '"+this.label+"' = "+log_probability);
+    // println("DEBUG: log. prob. of signal '"+this.label+"' = "+log_probability);
     return log_probability;
   }
   

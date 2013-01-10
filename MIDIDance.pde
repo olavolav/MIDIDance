@@ -62,8 +62,8 @@ boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, 
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
+int optimal_bayesian_vector_length = 1;
 boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
-int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 10;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
@@ -165,7 +165,7 @@ void keyPressed() {
         screen.alert("Wrote recorded hits to file.");
         break;
       case 'l':
-        if( BAYESIAN_MODE_ENABLED && load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
+        if( load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
           screen.alert("Loaded recorded hits from file.");
         } else {
           screen.alert("Error: Failed to load hits from file.");
@@ -175,7 +175,7 @@ void keyPressed() {
         if( BAYESIAN_MODE_ENABLED ) {
           if( analyzer.learn_based_on_recorded_hits() ) {
             currently_in_recording_phase = false;
-            screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits());
+            screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits_and_determine_optimal_length());
           } else {
             screen.alert("Bayesian models could not be completed.");
           }
@@ -212,7 +212,6 @@ boolean test_setup() {
   
   if(SIGNAL_GROUP_OF_AXIS.length != NUMBER_OF_SIGNALS) { println("test_setup: error #1!"); all_fine = false; }
   if(SIGNAL_GROUP_OF_OUTCOME.length != OUTCOMES_LABEL.length) { println("test_setup: error #2!"); all_fine = false; }
-  if(LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS > LENGTH_OF_PAST_VALUES) { println("test_setup: error #3!"); all_fine = false; }
   if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #4!"); all_fine = false; }
 
   if( !BAYESIAN_MODE_ENABLED && NUMBER_OF_SIGNALS != OUTCOMES_LABEL.length ) { println("test_setup: error #5!"); all_fine = false; }
