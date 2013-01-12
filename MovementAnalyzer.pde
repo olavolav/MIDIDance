@@ -88,7 +88,7 @@ class MovementAnalyzer {
         }
       }
     }
-    println("DEBUG: MovementAnalyzer#detect: Most likely outcome = "+most_likely_outcome);
+    // println("DEBUG: MovementAnalyzer#detect: Most likely outcome = "+most_likely_outcome);
     return most_likely_outcome;
   }
   
@@ -97,21 +97,27 @@ class MovementAnalyzer {
     float optimal_accuracy_found = -0.5*Float.MAX_VALUE;
     float accuracy_found;
     for(int l=1; l<LENGTH_OF_PAST_VALUES; l++) {
-      accuracy_found = detect_accuracy_of_all_prerecorded_hits( l );
+      accuracy_found = detect_accuracy_of_all_prerecorded_hits( l, true );
       if( accuracy_found > optimal_accuracy_found ) {
         optimal_accuracy_found = accuracy_found;
         optimal_length_found = l;
       }  
       screen.draw_progress_bar( (1.0*l)/(LENGTH_OF_PAST_VALUES-1.0) );
+      if( accuracy_found == 1.0 ) {
+        println("...reached 100% accuracy.");
+        break;
+      }
     }
     if( optimal_accuracy_found > 0.0 ) {
       optimal_bayesian_vector_length = optimal_length_found;
-      println("=> Accuracy of "+optimal_accuracy_found+" at length "+optimal_length_found);
+      println("=> Found optimal projected accuracy of "+optimal_accuracy_found+" at optimal length "+optimal_length_found);
     }
     return optimal_accuracy_found;
   }
-  
   float detect_accuracy_of_all_prerecorded_hits(int bayesian_length) {
+    return detect_accuracy_of_all_prerecorded_hits( bayesian_length, false );
+  }
+  float detect_accuracy_of_all_prerecorded_hits(int bayesian_length, boolean verbose) {
     int[] relevant_for_this = new int[this.outcomes.length];
     int[] correct_for_this = new int[this.outcomes.length];
     for (int oo=0; oo<this.outcomes.length; oo++) {
@@ -139,16 +145,19 @@ class MovementAnalyzer {
       }
     }
     
-    println("DEBUG: Learning performance overview: (length "+bayesian_length+")");
-    for (int oo=0; oo<this.outcomes.length; oo++) {
-      print(" - outcome #"+oo+" ("+this.outcomes[oo].label+"): ");
-      if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[oo] == false ) {
-        print( (100.0*float(correct_for_this[oo])/float(relevant_for_this[oo]))+"%" );
-        println( " (based on "+relevant_for_this[oo]+" target hits)");
-      } else {
-        println("skipped.");
+    if(verbose) {
+      println("------ Learning performance overview (length "+bayesian_length+") ------");
+      for (int oo=0; oo<this.outcomes.length; oo++) {
+        print(" - outcome #"+oo+" ("+this.outcomes[oo].label+"): ");
+        if( SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR[oo] == false ) {
+          print( (100.0*float(correct_for_this[oo])/float(relevant_for_this[oo]))+"%" );
+          println( " (based on "+relevant_for_this[oo]+" target hits)");
+        } else {
+          println("skipped.");
+        }
       }
     }
+    println("DEBUG: projected accuracy for length "+bayesian_length+" = "+float(correct_hits)/float(relevant_hits));
     
     return float(correct_hits)/float(relevant_hits);
   }
