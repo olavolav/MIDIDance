@@ -57,6 +57,17 @@ class Display {
     text(message,width/2,height/2);
   }
   
+  void draw_progress_bar(float fraction) {
+    float bounded_fraction = min( 1.0, max(0.0, fraction) );
+    noSmooth();
+    noFill();
+    stroke(#ffffff);
+    rect(width/4.0, height*0.666, round(width/2.0)+1, height/20.0);
+    noStroke();
+    fill(#ffffff);
+    rect(width/4.0, height*0.666, round(bounded_fraction*width/2.0)+1, height/20.0);
+  }
+  
 }
 
 color line_color(int j) {

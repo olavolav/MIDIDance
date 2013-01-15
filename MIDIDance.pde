@@ -21,15 +21,15 @@ boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 f
 float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-int NUMBER_OF_SIGNALS = 6;
+int NUMBER_OF_SIGNALS = 3;
 boolean SIMULATE_SERIAL_INPUT = false;
 int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 int SERIAL_PORT_NUMBER = 0;
-int SERIAL_PORT_BAUD_RATE = 6*9600;
+int SERIAL_PORT_BAUD_RATE = 2*9600;
 Signal input;
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
-int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
+int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
 int LENGTH_OF_PAST_VALUES = 30;
 
 // The display:
@@ -38,12 +38,12 @@ String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 int last_displayed_second_init, current_second_init;
 
 // Option A-1) The Bayesian movement analyzer (2x accelerometer):
-//boolean BAYESIAN_MODE_ENABLED = true;
-//String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
-//int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
-//int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
-//int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
-//boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
+// boolean BAYESIAN_MODE_ENABLED = true;
+// String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
+// int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
+// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
 
 // Option A-2) The Bayesian movement analyzer (1x Nunchuck):
 boolean BAYESIAN_MODE_ENABLED = true;
@@ -53,18 +53,18 @@ int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
 boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
 
 // Option B) The velocity threshold analyzer:
- //boolean BAYESIAN_MODE_ENABLED = false;
- //String[] OUTCOMES_LABEL = AXIS_LABELS;
- //int[] MIDI_PITCH_CODES =  { 40, 41, 52};//, 57, 40, 38}; // if Bayesian is disabled
- //int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0};//, 0};
- //boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false};//, false, false, false};
+// boolean BAYESIAN_MODE_ENABLED = false;
+// String[] OUTCOMES_LABEL = AXIS_LABELS;
+// int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
+// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
+// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false, false, false, false};
 
 // The general analyzer paramters:
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
+int optimal_bayesian_vector_length = 1;
 boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
-int LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS = 3*10;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
@@ -166,7 +166,7 @@ void keyPressed() {
         screen.alert("Wrote recorded hits to file.");
         break;
       case 'l':
-        if( BAYESIAN_MODE_ENABLED && load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
+        if( load_hits_information_from_file(RECORDED_HITS_INPUT_FILE) ) {
           screen.alert("Loaded recorded hits from file.");
         } else {
           screen.alert("Error: Failed to load hits from file.");
@@ -176,7 +176,7 @@ void keyPressed() {
         if( BAYESIAN_MODE_ENABLED ) {
           if( analyzer.learn_based_on_recorded_hits() ) {
             currently_in_recording_phase = false;
-            screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits());
+            screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits_and_determine_optimal_length());
           } else {
             screen.alert("Bayesian models could not be completed.");
           }
@@ -213,7 +213,6 @@ boolean test_setup() {
   
   if(SIGNAL_GROUP_OF_AXIS.length != NUMBER_OF_SIGNALS) { println("test_setup: error #1!"); all_fine = false; }
   if(SIGNAL_GROUP_OF_OUTCOME.length != OUTCOMES_LABEL.length) { println("test_setup: error #2!"); all_fine = false; }
-  if(LENGTH_OF_PAST_VALUES_FOR_BAYESIAN_ANALYSIS > LENGTH_OF_PAST_VALUES) { println("test_setup: error #3!"); all_fine = false; }
   if(OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED.length != NULL_OUTCOME_FOR_SIGNAL_GROUP.length) { println("test_setup: error #4!"); all_fine = false; }
 
   if( !BAYESIAN_MODE_ENABLED && NUMBER_OF_SIGNALS != OUTCOMES_LABEL.length ) { println("test_setup: error #5!"); all_fine = false; }
