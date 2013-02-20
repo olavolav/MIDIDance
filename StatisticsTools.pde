@@ -53,3 +53,7 @@ float StatisticsTools__variance(float[] data, int start_index, int end_index) {
   }
   return sum/float(end_index-start_index+1);
 }
+
+float StatisticsTools__log_Gauss_PDF(float x, float mean, float stddev) {
+  return ( -1.0*log(stddev * sqrt(2.0*PI)) - 0.5*pow( (x - mean)/stddev, 2.0) );
+}
