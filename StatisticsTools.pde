@@ -20,7 +20,7 @@ float StatisticsTools__mean(float[] data, int start_index, int end_index) {
 float StatisticsTools__standard_deviation(float[] data, int start_index, int end_index) {
   float var = StatisticsTools__variance(data, start_index, end_index);
   if(var < 0.0) { return -1.0; }
-  return sqrt(StatisticsTools__variance(data, start_index, end_index));
+  return sqrt(var);
 }
 
 float StatisticsTools__variance(float[] data, int start_index, int end_index) {
