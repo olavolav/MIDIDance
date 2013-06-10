@@ -72,8 +72,8 @@ class Signal {
 
     for(j=0; j<NUMBER_OF_SIGNALS; j++) {
       if( !axis_dim[j].is_instrument && abs(axis_dim[j].normalized_old_value()-axis_dim[j].value) > 0.01 ) {
-      	myBus.sendControllerChange(MIDI_CHANNEL, j, round(127*axis_dim[j].normalized_value())); // Send a controllerChange
-      	updated_a_controller = true;
+        myBus.sendControllerChange(MIDI_CHANNEL, j, round(127*axis_dim[j].normalized_value())); // Send a controllerChange
+        updated_a_controller = true;
       }
     }
     return updated_a_controller;

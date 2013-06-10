@@ -71,7 +71,7 @@ int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 1;
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 12.;
+float INIT_SECONDS = 18.;
 float max_velocity;
 
 
@@ -101,6 +101,7 @@ void setup() { /////////////////////////////////////////////////////////////////
 }
 
 void draw() { //////////////////////////////////////////////////////////////////////////////// draw /////////////
+  
   fadeOutTones();
   screen.update_value_display();
   
@@ -138,23 +139,23 @@ void keyPressed() {
       }
     }
   } else {
-  	switch(key) {
-  	  case '+':
-  		  input.xthresh += 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case '-':
-  		  input.xthresh -= 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case 'd':
-  		  println("--- DEBUG INFO ---");
-  		  println("inBuffer = "+input.inBuffer);
-  		  println("number of lines read = "+input.lines_read);
-  		  println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
-  		  println("rolling = "+screen.rolling);
-  		  println("number of recoded hits = "+collectedHits.length);
-  		  println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
+    switch(key) {
+      case '+':
+        input.xthresh += 0.02;
+        screen.alert("xthresh = "+input.xthresh);
+        break;
+      case '-':
+        input.xthresh -= 0.02;
+        screen.alert("xthresh = "+input.xthresh);
+        break;
+      case 'd':
+        println("--- DEBUG INFO ---");
+        println("inBuffer = "+input.inBuffer);
+        println("number of lines read = "+input.lines_read);
+        println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
+        println("rolling = "+screen.rolling);
+        println("number of recoded hits = "+collectedHits.length);
+        println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
         break;
       case 'r':
         input.clear_buffer();
@@ -199,8 +200,8 @@ void keyPressed() {
         }        
         screen.alert(help_message);
         break;
-  	}
-	}
+    }
+  }
 }
 
 boolean currently_in_init_phase() {
