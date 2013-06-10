@@ -1,4 +1,5 @@
 import processing.serial.*;
+import java.util.regex.*;
 
 int[] tempValues = new int[NUMBER_OF_SIGNALS];
 
@@ -15,6 +16,8 @@ class Signal {
   float time_of_first_signal_MS = -1.0;
   String read_input_line;
   float time_of_last_line_read_ms;
+  
+  
   
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
