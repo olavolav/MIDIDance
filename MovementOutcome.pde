@@ -35,7 +35,7 @@ class MovementOutcome {
           } else { // if we want to compute the prob. of a pre-recorded hit
             current_value = event.value_history[axis_index][time_lag];
           }
-          log_probability += StatisticsTools__log_Gauss_PDF( current_value, avg_target_move[axis_index][time_lag], std_target_move[axis_index][time_lag] );
+          log_probability += StatisticsTools.log_Gauss_PDF( current_value, avg_target_move[axis_index][time_lag], std_target_move[axis_index][time_lag] );
         }
       }
     }
