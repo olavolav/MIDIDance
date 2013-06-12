@@ -1,4 +1,5 @@
 *.txt
 *.eps
 *.indd
+.DS_Store
 
