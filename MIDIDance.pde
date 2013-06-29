@@ -11,20 +11,20 @@ String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
 // the MIDI bus:
 MidiBus myBus;
 Tone[] activeTones = new Tone[0];
-int MIDI_CHANNEL = 0;
+final int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1";
 // String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
 String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
 
-boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
-float TONE_LENGTH = 300.; // in ms
+final boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
+final float TONE_LENGTH = 300.; // in ms
 
 // The serial port:
-int NUMBER_OF_SIGNALS = 3;
-boolean SIMULATE_SERIAL_INPUT = false;
-int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
-int SERIAL_PORT_NUMBER = 0;
-int SERIAL_PORT_BAUD_RATE = 2*9600;
+final int NUMBER_OF_SIGNALS = 3+3;
+final boolean SIMULATE_SERIAL_INPUT = true;
+final int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
+final int SERIAL_PORT_NUMBER = 0;
+final int SERIAL_PORT_BAUD_RATE = 6*9600;
 Signal input;
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
@@ -33,7 +33,7 @@ int LENGTH_OF_PAST_VALUES = 30;
 
 // The display:
 Display screen;
-String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
+final String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 int last_displayed_second_init, current_second_init;
 
 // Option A-1) The Bayesian movement analyzer (2x accelerometer):
@@ -107,7 +107,7 @@ void draw() { //////////////////////////////////////////////////////////////////
   
   // read values from Arduino
   while (input.get_next_data_point()) {
-    if(currently_in_init_phase()) {
+    if(Phases.Init) {
       screen.alert("get ready!");
       current_second_init = ceil(INIT_SECONDS - millis()/1000.0);
       if( current_second_init < last_displayed_second_init ) {
@@ -150,6 +150,7 @@ void keyPressed() {
         break;
       case 'd':
         println("--- DEBUG INFO ---");
+        println("Phases: Init = "+Phases.Init+", Recording = "+Phases.Recording);
         println("inBuffer = "+input.inBuffer);
         println("number of lines read = "+input.lines_read);
         println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
@@ -175,7 +176,7 @@ void keyPressed() {
       case 'z':
         if( BAYESIAN_MODE_ENABLED ) {
           if( analyzer.learn_based_on_recorded_hits() ) {
-            currently_in_recording_phase = false;
+            Phases.Recording = false;
             screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits_and_determine_optimal_length());
           } else {
             screen.alert("Bayesian models could not be completed.");
@@ -202,10 +203,6 @@ void keyPressed() {
         break;
     }
   }
-}
-
-boolean currently_in_init_phase() {
-  return (millis()/1000.0 < INIT_SECONDS);
 }
 
 boolean test_setup() {

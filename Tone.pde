@@ -17,7 +17,7 @@ class Tone {
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     
-    if(BAYESIAN_MODE_ENABLED && !currently_in_init_phase()) {
+    if(BAYESIAN_MODE_ENABLED && !Phases.Init) {
       new Hit(outcome, NULL_OUTCOME_FOR_SIGNAL_GROUP[associated_signal_group]);
     }
     

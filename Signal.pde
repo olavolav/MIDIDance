@@ -104,7 +104,7 @@ class Signal {
         // hit!
         screen.draw_vertical_line( axis_of_max_velocity );
 
-        if( currently_in_recording_phase ) {
+        if(Phases.Recording) {
           screen.alert("recording shake: axis #"+axis_of_max_velocity);
           println("recording shake: axis #"+axis_of_max_velocity+", signal group #"+signal_group_of_max_velocity);
           analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[signal_group_of_max_velocity]].play_your_tone(1.9);
@@ -199,7 +199,7 @@ class Signal {
       last_time_we_extracted_a_number = found_a_number;
     }
 
-    if(currently_in_init_phase()) {
+    if(Phases.Init) {
       for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
         axis_dim[k].update_min_and_max();
       }
