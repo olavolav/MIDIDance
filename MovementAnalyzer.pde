@@ -1,6 +1,7 @@
 class MovementAnalyzer {
   
   MovementOutcome[] outcomes;
+  MovementTrigger trigger;
   float[] temp_detection_vector;
   
   MovementAnalyzer() {
@@ -8,6 +9,8 @@ class MovementAnalyzer {
     for(int oo=0; oo<this.outcomes.length; oo++) {
       outcomes[oo] = new MovementOutcome(oo, OUTCOMES_LABEL[oo], SIGNAL_GROUP_OF_OUTCOME[oo], MIDI_PITCH_CODES[oo%(MIDI_PITCH_CODES.length)]);
     }
+    
+    trigger = new MovementTrigger();
     
     temp_detection_vector = new float[MAX_NUMBER_OF_EVENTS_FOR_LEARNING];
   }

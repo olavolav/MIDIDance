@@ -16,7 +16,7 @@ class Signal {
   float time_of_first_signal_MS = -1.0;
   String read_input_line;
   float time_of_last_line_read_ms;
-  
+  int[] target_outcome;
   
   
   Signal(PApplet app, boolean simulate_serial_input) {
@@ -43,12 +43,8 @@ class Signal {
     }
     lines_read = 0;
     numbers_read = 0;
-  }
-  
-  void shutdown_port() {
-    if(!this.simulation) {
-      this.myPort.stop();
-    }
+    
+    target_outcome = new int[0];
   }
   
   void clear_buffer() {
@@ -219,6 +215,8 @@ class Signal {
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k].update_vector_of_past_values();
     }
+    // since this also means appending to the long term recording, add a value to the target signal as well
+    if(Phases.Recording) target_outcome = (int[])append(target_outcome, 0);
   }
   
   float rate_of_signal_per_axis_Hz() {
@@ -227,4 +225,13 @@ class Signal {
     return (this.numbers_read/this.axis_dim.length) / ((millis() - this.time_of_first_signal_MS)/1000.0);
   }
 
+  String status_information_of_recorded_sample(int t) {
+    if(t < 0 || t >= this.target_outcome.length) return "";
+    String text = "" + this.target_outcome[t];
+    for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
+      // if(k>0) text += ", "
+      text += ", " + this.axis_dim[k].long_term_recording[t];
+    }
+    return text;
+  }
 }

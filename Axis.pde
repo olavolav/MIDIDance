@@ -4,6 +4,8 @@ class Axis {
   int signal_group = 0;
   boolean is_instrument = true;
   float[] last_values_buffer;
+  boolean currently_recording = false;
+  float[] long_term_recording;
 
   Axis(boolean instr, int sg) {
     value = 0;
@@ -16,6 +18,8 @@ class Axis {
     for(int t=0; t<LENGTH_OF_PAST_VALUES; t++) {
       last_values_buffer[t] = 0.0;
     }
+    
+    long_term_recording = new float[0];
   }
 
   void update_min_and_max() {
@@ -29,6 +33,10 @@ class Axis {
       this.last_values_buffer[t] = this.last_values_buffer[t-1];
     }
     this.last_values_buffer[0] = this.normalized_value();
+    
+    if(Phases.Recording) {
+      this.long_term_recording = (float[])append(this.long_term_recording, this.last_values_buffer[0]);
+    }
   }
 
   float normalized_value() {

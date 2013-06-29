@@ -5,16 +5,19 @@ import themidibus.*;
 
 // For collecting a history of hits and adapting thresholds:
 Hit[] collectedHits = new Hit[0];
-String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
-String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
+// String RECORDED_HITS_OUTPUT_FILE = "test-debug.txt";
+final String RECORDED_HITS_INPUT_FILE = "test-17-2036.txt";
+final String RECORDED_HITS_OUTPUT_FILE = "test-final-18-2159.txt";
+final String RECORDED_RAW_SIGNAL_OUTPUT_FILE = "test-raw1.txt";
 
 // the MIDI bus:
 MidiBus myBus;
 Tone[] activeTones = new Tone[0];
 final int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1";
-// String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
-String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+final String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
+// String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
+// String MIDI_DEVICE_NAME = "mididance-win";
 
 final boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
 final float TONE_LENGTH = 300.; // in ms
@@ -26,10 +29,9 @@ final int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 final int SERIAL_PORT_NUMBER = 0;
 final int SERIAL_PORT_BAUD_RATE = 6*9600;
 Signal input;
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
-int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
-int LENGTH_OF_PAST_VALUES = 30;
+final int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
+// final int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
+final int LENGTH_OF_PAST_VALUES = 30;
 
 // The display:
 Display screen;
@@ -45,11 +47,19 @@ int last_displayed_second_init, current_second_init;
 // boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
 
 // Option A-2) The Bayesian movement analyzer (1x Nunchuck):
+// boolean BAYESIAN_MODE_ENABLED = true;
+// String[] OUTCOMES_LABEL = { "null", "side hit", "up point", "slap", "left lock", "sweep", "fling up" };
+// int[] MIDI_PITCH_CODES =  { -1, 52, 57, 40, 38, 41, 55 };
+// int[] SIGNAL_GROUP_OF_OUTCOME = { 0, 0, 0, 0, 0, 0, 0 };
+// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = { true, false, false, false, false, false, false};
+
+// Option A-2) The Bayesian movement analyzer (2x Nunchuck):
 boolean BAYESIAN_MODE_ENABLED = true;
-String[] OUTCOMES_LABEL = { "null", "left", "up","right" };
-int[] MIDI_PITCH_CODES =  { -1, 52, 57, 40 };
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
-boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
+String[] OUTCOMES_LABEL = { "R null", "L null", "R side hit ", "L reach pop", "R clock", "L up point", "L tut down", "L writst rotate", "R wrist rotate" };
+
+int[] MIDI_PITCH_CODES =  { -1, -1, 41, 43, 46, 52, 48, 51, 40 };
+int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 1, 0, 1, 1, 1, 0};
+boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false, false, false, false};
 
 // Option B) The velocity threshold analyzer:
 // boolean BAYESIAN_MODE_ENABLED = false;
@@ -63,7 +73,7 @@ int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 int triggered_analyzer_event;
 int optimal_bayesian_vector_length = 1;
-boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
+// boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
@@ -122,17 +132,20 @@ void draw() { //////////////////////////////////////////////////////////////////
   }
   delay(40);
   screen.simple_blenddown(BLENDDOWN_ALPHA);
+  
+  update_phases();
 }
 
 void keyPressed() {
   if(key>=int('0') && key <=int('9')) {
     int ch = int(key) - int('0');
     if(ch < OUTCOMES_LABEL.length) {
-      if( BAYESIAN_MODE_ENABLED ) {
-        if(collectedHits.length > 0) {
-          collectedHits[collectedHits.length-1].target_outcome = ch;
-          screen.alert("LEARN: Set target of last hit to #"+ch+" ("+analyzer.outcomes[ch].label+")");
-        }
+      if(BAYESIAN_MODE_ENABLED) {
+        // if(collectedHits.length > 0) {
+        //   collectedHits[collectedHits.length-1].target_outcome = ch;
+        //   screen.alert("LEARN: Set target of last hit to #"+ch+" ("+analyzer.outcomes[ch].label+")");
+        // }
+        input.target_outcome[input.target_outcome.length - 1] = ch;
       } else { // no Bayesian mode
         screen.alert("Playing test tone of axis #"+ch);
         analyzer.outcomes[ch].play_your_tone(127); //,ch);
@@ -157,10 +170,20 @@ void keyPressed() {
         println("rolling = "+screen.rolling);
         println("number of recoded hits = "+collectedHits.length);
         println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
+        println("length of long term recording (samples): "+input.target_outcome.length+" / "+input.axis_dim[0].long_term_recording.length);
         break;
-      case 'r':
+      case 'x':
         input.clear_buffer();
         println("Reset input buffer.");
+        break;
+      case 'r':
+        if(Phases.Recording) {
+          screen.alert("Recording: off, writing to disk.");
+          save_recording_to_file(RECORDED_RAW_SIGNAL_OUTPUT_FILE);
+        } else {
+          screen.alert("Recording: on");
+        }
+        Phases.Recording = !(Phases.Recording);
         break;
       case 'w':
         save_hits_information_to_file(RECORDED_HITS_OUTPUT_FILE);
@@ -188,7 +211,7 @@ void keyPressed() {
           "+ raise threshold\n"+
           "- lower threshold\n"+
           "h print this help message\n"+
-          "r reset input buffer\n"+
+          "x reset input buffer\n"+
           "d print debug info\n"+
           "ESC quit\n";
         if( BAYESIAN_MODE_ENABLED ) {
@@ -292,4 +315,15 @@ boolean load_hits_information_from_file(String file_name) {
     }
   }
   return true;
+}
+
+void save_recording_to_file(String file_name) {
+  int number_of_recorded_samples = input.target_outcome.length - 1;
+  String[] for_saving = new String[number_of_recorded_samples];
+  
+  for(int n=0; n<number_of_recorded_samples; n++) {
+    for_saving[n] = input.status_information_of_recorded_sample(n);
+  }
+  // write to file
+  saveStrings(file_name,for_saving);
 }
