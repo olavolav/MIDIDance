@@ -22,7 +22,7 @@ int optimal_bayesian_vector_length = 1;
 int i,j;
 
 
-void setup { /////////////////////////////////////////////////////////////////// setup /////////////
+void setup() { /////////////////////////////////////////////////////////////////// setup /////////////
   
   if(test_setup() == false) {
     println("-> Error: Invalid setup parameters! (see test_setup() in MIDIDance.pde for details)");
