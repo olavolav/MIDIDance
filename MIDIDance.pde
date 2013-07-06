@@ -30,6 +30,7 @@ Signal input;
 // int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
 int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
 int LENGTH_OF_PAST_VALUES = 30;
+int TRIGGER_TYPE = MovementTriggerTypes.SingleThreshold;
 
 // The display:
 Display screen;
@@ -61,6 +62,7 @@ boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, 
 // The general analyzer paramters:
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
+MovementTrigger trigger;
 int triggered_analyzer_event;
 int optimal_bayesian_vector_length = 1;
 boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
@@ -71,8 +73,7 @@ int BLENDDOWN_ALPHA = 20;
 int ROLLING_INCREMENT = 1;
 int i,j;
 color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 18.;
-float max_velocity;
+float INIT_SECONDS = 10.0;
 
 
 void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
@@ -93,6 +94,8 @@ void setup() { /////////////////////////////////////////////////////////////////
 
   // Init serial ports
   input = new Signal(this,SIMULATE_SERIAL_INPUT);
+  
+  trigger = new MovementTrigger(TRIGGER_TYPE);
   
   analyzer = new MovementAnalyzer();
     
@@ -156,6 +159,7 @@ void keyPressed() {
       case 'd':
         println("--- DEBUG INFO ---");
         println("Phases: Init = "+Phases.Init+", Recording = "+Phases.Recording);
+        println("Trigger type: "+trigger.explain_type());
         println("inBuffer = "+input.inBuffer);
         println("number of lines read = "+input.lines_read);
         println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
@@ -188,18 +192,23 @@ void keyPressed() {
           }
         }
         break;
+      case 't':
+        TRIGGER_TYPE = trigger.cycle_type();
+        screen.alert("switched trigger type: "+trigger.explain_type());
+        break;
       case 'h':
-        String help_message = "help:\n"+
-          "+ raise threshold\n"+
-          "- lower threshold\n"+
-          "h print this help message\n"+
-          "r reset input buffer\n"+
-          "d print debug info\n"+
+        String help_message = "help:\n" +
+          "+ raise threshold\n" +
+          "- lower threshold\n" +
+          "h print this help message\n" +
+          "r reset input buffer\n" +
+          "d print debug info\n" +
+          "t cycle trigger methods\n" +
           "ESC quit\n";
         if( BAYESIAN_MODE_ENABLED ) {
           help_message += "(0-9) assign target channel to last hit\n" +
-            "w write recorded hits to disk\n"+
-            "l load recorded hits from disk\n"+
+            "w write recorded hits to disk\n" +
+            "l load recorded hits from disk\n" +
             "z end learning mode and define Bayesian models (!)";
         } else {
           help_message += "(0-9) play test tone of axis";

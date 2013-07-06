@@ -57,18 +57,16 @@ class Signal
   }
   
   boolean group_is_already_playing_a_tone(int s_group) {
-    boolean found_a_live_tone = false;
     // println("DEBUG: Call to group_is_already_playing_a_tone, s_group = "+s_group+", nr. of tones = "+activeTones.length);
     
     for(int mm=0; mm<activeTones.length; mm++) {
       // println("DEBUG: signal group of this tone = "+activeTones[mm].associated_signal_group);
       if(activeTones[mm].associated_signal_group == s_group) {
-        // println("DEBUG: There is a tone for that signal group tone playing already!");
-        found_a_live_tone = true;
-        break;
+        println("DEBUG: There is a tone for signal group #"+s_group+" tone playing already!");
+        return true;
       }
     }
-    return found_a_live_tone;
+    return false;
   }
   
   boolean send_controller_changes() {
@@ -84,38 +82,28 @@ class Signal
   }
   
   boolean detect_hit_and_play_tones() {
-    int axis_of_max_velocity = -1;
-    int signal_group_of_max_velocity = 0;
+    int triggering_axis = -1;
+    // int signal_group_of_max_velocity = 0;
     boolean played_a_tone = false;
     
-    for(int n=0; n<this.nr_groups; n++) {
+    for(int group=0; group<this.nr_groups; group++) {
       // once for each singal group (hand)
-      max_velocity = Float.MIN_VALUE;
-      for(j=0; j<NUMBER_OF_SIGNALS; j++) {
-        if (this.axis_dim[j].is_instrument && this.axis_dim[j].signal_group == n && this.axis_dim[j].velocity() > max_velocity) {
-          max_velocity = this.axis_dim[j].velocity();
-          axis_of_max_velocity = j;
-        }
-      }
-      
-      if( axis_of_max_velocity >= 0 ) {
-        signal_group_of_max_velocity = input.axis_dim[axis_of_max_velocity].signal_group;
-      }
-      if(max_velocity > this.xthresh && !this.group_is_already_playing_a_tone(signal_group_of_max_velocity)) {
+      triggering_axis = trigger.detect(group);
+      if(triggering_axis > -1) {
         // hit!
-        screen.draw_vertical_line( axis_of_max_velocity );
-
+        screen.draw_vertical_line(triggering_axis);
+        
         if(Phases.Recording) {
-          screen.alert("recording shake: axis #"+axis_of_max_velocity);
-          println("recording shake: axis #"+axis_of_max_velocity+", signal group #"+signal_group_of_max_velocity);
-          analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[signal_group_of_max_velocity]].play_your_tone(1.9);
+          screen.alert("recording shake: axis #"+triggering_axis);
+          println("recording shake: axis #"+triggering_axis+", signal group #"+group);
+          analyzer.outcomes[OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED[group]].play_your_tone(1.9);
         }
         else { // after recording phase
           int most_likely_outcome;
           if( BAYESIAN_MODE_ENABLED ) {
-            most_likely_outcome = analyzer.detect( signal_group_of_max_velocity );
+            most_likely_outcome = analyzer.detect(group);
           } else { // if in old linear mode
-            most_likely_outcome = axis_of_max_velocity;
+            most_likely_outcome = triggering_axis;
           }
           if( most_likely_outcome >= 0 ) {
             analyzer.outcomes[most_likely_outcome].play_your_tone(1.9); //max_velocity);

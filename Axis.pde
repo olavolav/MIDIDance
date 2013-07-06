@@ -46,5 +46,15 @@ class Axis
   float velocity() {
     return abs(this.normalized_value() - this.normalized_old_value());
   }
+  
+  float average_of_last_values(int length) {
+    if(length < 1) { return 0.0; }
+    float sum = 0.0;
+    int actual_length = max(length, LENGTH_OF_PAST_VALUES-1);
+    for(int t=1; t<=actual_length; t++) {
+      sum += this.last_values_buffer[t];
+    }
+    return sum/actual_length;
+  }
 
 }
