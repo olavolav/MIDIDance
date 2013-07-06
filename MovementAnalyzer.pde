@@ -1,5 +1,5 @@
-class MovementAnalyzer {
-  
+class MovementAnalyzer
+{
   MovementOutcome[] outcomes;
   float[] temp_detection_vector;
   
@@ -60,11 +60,11 @@ class MovementAnalyzer {
   }
   
   private float __calculate_average_of_detection_vector(int count) {
-    return StatisticsTools__mean(temp_detection_vector, 0, count-1);
+    return StatisticsTools.mean(temp_detection_vector, 0, count-1);
   }
 
   private float __calculate_standard_deviation_of_detection_vector(int count) {
-    return StatisticsTools__standard_deviation(temp_detection_vector, 0, count-1);
+    return StatisticsTools.standard_deviation(temp_detection_vector, 0, count-1);
   }
   
   int detect(int triggering_signal_group) {

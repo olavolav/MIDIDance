@@ -1,4 +1,5 @@
-class Tone {
+class Tone
+{
   int channel;
   int pitch;
   int velocity;
@@ -17,7 +18,7 @@ class Tone {
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     
-    if(BAYESIAN_MODE_ENABLED && !currently_in_init_phase()) {
+    if(BAYESIAN_MODE_ENABLED && !Phases.Init) {
       new Hit(outcome, NULL_OUTCOME_FOR_SIGNAL_GROUP[associated_signal_group]);
     }
     
@@ -30,16 +31,13 @@ class Tone {
         activeTones[m].startMS = millis();
         activeTones[m].associated_signal_group = s;
         is_present = true;
+        break;
       }
     }
     // println("debug in Tone: adding tone, is_present: "+int(is_present));
     if(!is_present) {
-      Tone[] newActiveTones = new Tone[activeTones.length+1];
-      for(int m=0; m<activeTones.length; m++) {
-        newActiveTones[m] = activeTones[m];
-      }
-      newActiveTones[activeTones.length] = this;
-      activeTones = newActiveTones;
+      // add this tone to list
+      activeTones = (Tone[])append(activeTones, this);
     }
     // println("DEBUG: new number of active tones: "+activeTones.length);
   }

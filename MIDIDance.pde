@@ -1,89 +1,38 @@
 import themidibus.*;
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////// init /////////////
+/////////////////////////////////////////////////////////////////// init /////////////
 
 // For collecting a history of hits and adapting thresholds:
 Hit[] collectedHits = new Hit[0];
-String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
-String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
-
-// the MIDI bus:
+// the MIDI bus
 MidiBus myBus;
 Tone[] activeTones = new Tone[0];
-int MIDI_CHANNEL = 0;
-// String MIDI_DEVICE_NAME = "IAC-Bus 1";
-// String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
-//String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
-String MIDI_DEVICE_NAME = "LoopBe Internal MIDI";
-
-boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
-float TONE_LENGTH = 300.; // in ms
-
-// The serial port:
-int NUMBER_OF_SIGNALS = 3;
-boolean SIMULATE_SERIAL_INPUT = false;
-int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
-int SERIAL_PORT_NUMBER = 0;
-int SERIAL_PORT_BAUD_RATE = 2*9600;
+// The serial port
 Signal input;
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
-int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
-int LENGTH_OF_PAST_VALUES = 30;
-
 // The display:
 Display screen;
-String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 int last_displayed_second_init, current_second_init;
-
-// Option A-1) The Bayesian movement analyzer (2x accelerometer):
-// boolean BAYESIAN_MODE_ENABLED = true;
-// String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
-// int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
-
-// Option A-2) The Bayesian movement analyzer (1x Nunchuck):
-boolean BAYESIAN_MODE_ENABLED = true;
-String[] OUTCOMES_LABEL = { "null", "left", "up","right" };
-int[] MIDI_PITCH_CODES =  { -1, 52, 57, 40 };
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
-boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
-
-// Option B) The velocity threshold analyzer:
-// boolean BAYESIAN_MODE_ENABLED = false;
-// String[] OUTCOMES_LABEL = AXIS_LABELS;
-// int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false, false, false, false};
-
 // The general analyzer paramters:
-int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
+MovementTrigger trigger;
 int triggered_analyzer_event;
 int optimal_bayesian_vector_length = 1;
-boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
-int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
-int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
-int BLENDDOWN_ALPHA = 20;
-int ROLLING_INCREMENT = 1;
 int i,j;
-color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 12.;
-float max_velocity;
 
 
-void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
+void setup() { /////////////////////////////////////////////////////////////////// setup /////////////
   
   if(test_setup() == false) {
     println("-> Error: Invalid setup parameters! (see test_setup() in MIDIDance.pde for details)");
     exit();
   }
   
-  if( BAYESIAN_MODE_ENABLED ) { println("Hit detector mode: Bayesian"); }
+  if( BAYESIAN_MODE_ENABLED ) {
+    println("Hit detector mode: Bayesian");
+    Phases.Recording = true;
+  }
   else { println("Hit detector mode: Max. velocity"); }
   
   size(600,400);
@@ -91,6 +40,8 @@ void setup() { /////////////////////////////////////////////////////////////////
 
   // Init serial ports
   input = new Signal(this,SIMULATE_SERIAL_INPUT);
+  
+  trigger = new MovementTrigger(TRIGGER_TYPE);
   
   analyzer = new MovementAnalyzer();
     
@@ -101,13 +52,14 @@ void setup() { /////////////////////////////////////////////////////////////////
   last_displayed_second_init = ceil(INIT_SECONDS - millis()/1000.0);
 }
 
-void draw() { //////////////////////////////////////////////////////////////////////////////// draw /////////////
+void draw() { /////////////////////////////////////////////////////////////////// draw /////////////
+  
   fadeOutTones();
   screen.update_value_display();
   
   // read values from Arduino
   while (input.get_next_data_point()) {
-    if(currently_in_init_phase()) {
+    if(Phases.Init) {
       screen.alert("get ready!");
       current_second_init = ceil(INIT_SECONDS - millis()/1000.0);
       if( current_second_init < last_displayed_second_init ) {
@@ -122,6 +74,8 @@ void draw() { //////////////////////////////////////////////////////////////////
   }
   delay(40);
   screen.simple_blenddown(BLENDDOWN_ALPHA);
+  
+  update_phases();
 }
 
 void keyPressed() {
@@ -139,23 +93,25 @@ void keyPressed() {
       }
     }
   } else {
-  	switch(key) {
-  	  case '+':
-  		  input.xthresh += 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case '-':
-  		  input.xthresh -= 0.02;
-  		  screen.alert("xthresh = "+input.xthresh);
-  		  break;
-  		case 'd':
-  		  println("--- DEBUG INFO ---");
-  		  println("inBuffer = "+input.inBuffer);
-  		  println("number of lines read = "+input.lines_read);
-  		  println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
-  		  println("rolling = "+screen.rolling);
-  		  println("number of recoded hits = "+collectedHits.length);
-  		  println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
+    switch(key) {
+      case '+':
+        input.xthresh += 0.02;
+        screen.alert("xthresh = "+input.xthresh);
+        break;
+      case '-':
+        input.xthresh -= 0.02;
+        screen.alert("xthresh = "+input.xthresh);
+        break;
+      case 'd':
+        println("--- DEBUG INFO ---");
+        println("Phases: Init = "+Phases.Init+", Recording = "+Phases.Recording);
+        println("Trigger type: "+trigger.explain_type());
+        println("inBuffer = "+input.inBuffer);
+        println("number of lines read = "+input.lines_read);
+        println("rate of signal input per axis = "+input.rate_of_signal_per_axis_Hz()+" Hz");
+        println("rolling = "+screen.rolling);
+        println("number of recoded hits = "+collectedHits.length);
+        println("rec. hits by target outcome: "+analyzer.status_of_recorded_hits_per_outcome());
         break;
       case 'r':
         input.clear_buffer();
@@ -175,37 +131,38 @@ void keyPressed() {
       case 'z':
         if( BAYESIAN_MODE_ENABLED ) {
           if( analyzer.learn_based_on_recorded_hits() ) {
-            currently_in_recording_phase = false;
+            Phases.Recording = false;
             screen.alert("Bayesian models computed. Projected accuracy = "+analyzer.detect_accuracy_of_all_prerecorded_hits_and_determine_optimal_length());
           } else {
             screen.alert("Bayesian models could not be completed.");
           }
         }
         break;
+      case 't':
+        TRIGGER_TYPE = trigger.cycle_type();
+        screen.alert("switched trigger type: "+trigger.explain_type());
+        break;
       case 'h':
-        String help_message = "help:\n"+
-          "+ raise threshold\n"+
-          "- lower threshold\n"+
-          "h print this help message\n"+
-          "r reset input buffer\n"+
-          "d print debug info\n"+
+        String help_message = "help:\n" +
+          "+ raise threshold\n" +
+          "- lower threshold\n" +
+          "h print this help message\n" +
+          "r reset input buffer\n" +
+          "d print debug info\n" +
+          "t cycle trigger methods\n" +
           "ESC quit\n";
         if( BAYESIAN_MODE_ENABLED ) {
           help_message += "(0-9) assign target channel to last hit\n" +
-            "w write recorded hits to disk\n"+
-            "l load recorded hits from disk\n"+
+            "w write recorded hits to disk\n" +
+            "l load recorded hits from disk\n" +
             "z end learning mode and define Bayesian models (!)";
         } else {
           help_message += "(0-9) play test tone of axis";
         }        
         screen.alert(help_message);
         break;
-  	}
-	}
-}
-
-boolean currently_in_init_phase() {
-  return (millis()/1000.0 < INIT_SECONDS);
+    }
+  }
 }
 
 boolean test_setup() {

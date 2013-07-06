@@ -1,5 +1,5 @@
-class MovementOutcome {
-  
+class MovementOutcome
+{
   int serial_index;
   float[][] avg_target_move; // indices: [axis][time lag]
   float[][] std_target_move;
@@ -35,7 +35,7 @@ class MovementOutcome {
           } else { // if we want to compute the prob. of a pre-recorded hit
             current_value = event.value_history[axis_index][time_lag];
           }
-          log_probability += -1.0*log(std_target_move[axis_index][time_lag]*sqrt(2.0*PI)) - 0.5*pow( (current_value - avg_target_move[axis_index][time_lag]) / std_target_move[axis_index][time_lag], 2.0);
+          log_probability += StatisticsTools.log_Gauss_PDF( current_value, avg_target_move[axis_index][time_lag], std_target_move[axis_index][time_lag] );
         }
       }
     }

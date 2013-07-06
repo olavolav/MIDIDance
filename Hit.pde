@@ -1,4 +1,5 @@
-class Hit {
+class Hit
+{
   int actual_outcome;
   int target_outcome;
   float startMS;
@@ -26,13 +27,7 @@ class Hit {
     }
     
     // add this hit to list
-    Hit[] newCollectedHits = new Hit[collectedHits.length+1];
-    for(int m=0; m<collectedHits.length; m++) {
-      newCollectedHits[m] = collectedHits[m];
-    }
-    newCollectedHits[collectedHits.length] = this;
-    collectedHits = newCollectedHits;
-    
+    collectedHits = (Hit[])append(collectedHits, this);
   }
   
   boolean was_correctly_identified() {

@@ -1,4 +1,5 @@
-class Display {
+class Display
+{
   int rolling = 0;
   
   Display(int background_greylevel) {
