@@ -1,5 +1,5 @@
-class MovementOutcome {
-  
+class MovementOutcome
+{
   int serial_index;
   float[][] avg_target_move; // indices: [axis][time lag]
   float[][] std_target_move;

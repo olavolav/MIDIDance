@@ -1,5 +1,5 @@
-class MovementAnalyzer {
-  
+class MovementAnalyzer
+{
   MovementOutcome[] outcomes;
   float[] temp_detection_vector;
   

@@ -1,4 +1,5 @@
-class Hit {
+class Hit
+{
   int actual_outcome;
   int target_outcome;
   float startMS;

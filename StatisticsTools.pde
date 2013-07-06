@@ -1,7 +1,8 @@
 // Some statistics utility functions. Should at some point be packaged as
 // a new object for namespace reasons.
 
-static class StatisticsTools{
+static class StatisticsTools
+{
   static float mean(float[] data, int start_index, int end_index) {
     if( data.length < end_index || end_index < start_index ) {
       println("Error in StatisticsTools::mean: invalid paramters!");

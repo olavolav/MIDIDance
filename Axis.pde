@@ -1,4 +1,5 @@
-class Axis {
+class Axis
+{
   int value;
   int value_min, value_max;
   int signal_group = 0;

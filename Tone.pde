@@ -1,4 +1,5 @@
-class Tone {
+class Tone
+{
   int channel;
   int pitch;
   int velocity;

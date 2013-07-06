@@ -3,7 +3,8 @@ import java.util.regex.*;
 
 int[] tempValues = new int[NUMBER_OF_SIGNALS];
 
-class Signal {
+class Signal
+{
   boolean simulation;
   private Serial myPort = null;
   private String inBuffer = "";
