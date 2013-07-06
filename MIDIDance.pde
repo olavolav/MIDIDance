@@ -1,82 +1,28 @@
 import themidibus.*;
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////// init /////////////
+/////////////////////////////////////////////////////////////////// init /////////////
 
 // For collecting a history of hits and adapting thresholds:
 Hit[] collectedHits = new Hit[0];
-String RECORDED_HITS_OUTPUT_FILE = "test1.txt";
-String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
-
-// the MIDI bus:
+// the MIDI bus
 MidiBus myBus;
 Tone[] activeTones = new Tone[0];
-final int MIDI_CHANNEL = 0;
-// String MIDI_DEVICE_NAME = "IAC-Bus 1";
-// String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
-String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
-
-final boolean[] MIDI_SIGNAL_IS_AN_INSTRUMENT = {true,true,true,true,true,true}; // 1 for each outcome
-final float TONE_LENGTH = 300.; // in ms
-
-// The serial port:
-final int NUMBER_OF_SIGNALS = 3+3;
-final boolean SIMULATE_SERIAL_INPUT = true;
-final int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
-final int SERIAL_PORT_NUMBER = 0;
-final int SERIAL_PORT_BAUD_RATE = 6*9600;
+// The serial port
 Signal input;
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 1, 1, 1};
-// int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0, 0, 0, 0};
-int[] SIGNAL_GROUP_OF_AXIS = {0, 0, 0};
-int LENGTH_OF_PAST_VALUES = 30;
-int TRIGGER_TYPE = MovementTriggerTypes.SingleThreshold;
-
 // The display:
 Display screen;
-final String[] AXIS_LABELS = {"1x", "1y", "1z", "2x", "2y", "2z"};
 int last_displayed_second_init, current_second_init;
-
-// Option A-1) The Bayesian movement analyzer (2x accelerometer):
-// boolean BAYESIAN_MODE_ENABLED = true;
-// String[] OUTCOMES_LABEL = { "null-right", "null-left", "right-up","right-out","left-up","left-out"};
-// int[] MIDI_PITCH_CODES =  {           -1,          -1,         52,         57,       40,        38};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 1, 1};
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 0, 0, 0}; // for having both hands in the same signal group
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false};
-
-// Option A-2) The Bayesian movement analyzer (1x Nunchuck):
-boolean BAYESIAN_MODE_ENABLED = true;
-String[] OUTCOMES_LABEL = { "null", "left", "up","right" };
-int[] MIDI_PITCH_CODES =  { -1, 52, 57, 40 };
-int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 0};
-boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, false, false, false};
-
-// Option B) The velocity threshold analyzer:
-// boolean BAYESIAN_MODE_ENABLED = false;
-// String[] OUTCOMES_LABEL = AXIS_LABELS;
-// int[] MIDI_PITCH_CODES =  { 40, 41, 52, 57, 40, 38}; // if Bayesian is disabled
-// int[] SIGNAL_GROUP_OF_OUTCOME = {0, 0, 0, 1, 1, 1};
-// boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {false, false, false, false, false, false};
-
 // The general analyzer paramters:
-int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 MovementAnalyzer analyzer;
 MovementTrigger trigger;
 int triggered_analyzer_event;
 int optimal_bayesian_vector_length = 1;
-boolean currently_in_recording_phase = BAYESIAN_MODE_ENABLED;
-int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
-int[] OUTCOME_TO_PLAY_DURING_REC_WHEN_GROUP_IS_TRIGGERED = {0, 1};
 
-int BLENDDOWN_ALPHA = 20;
-int ROLLING_INCREMENT = 1;
 int i,j;
-color[] LINE_COLORS = {#1BA5E0,#B91BE0,#E0561B,#42E01B,#EDE13B,#D4AADC};
-float INIT_SECONDS = 10.0;
 
 
-void setup() { //////////////////////////////////////////////////////////////////////////////// setup /////////////
+void setup { /////////////////////////////////////////////////////////////////// setup /////////////
   
   if(test_setup() == false) {
     println("-> Error: Invalid setup parameters! (see test_setup() in MIDIDance.pde for details)");
@@ -106,7 +52,7 @@ void setup() { /////////////////////////////////////////////////////////////////
   last_displayed_second_init = ceil(INIT_SECONDS - millis()/1000.0);
 }
 
-void draw() { //////////////////////////////////////////////////////////////////////////////// draw /////////////
+void draw() { /////////////////////////////////////////////////////////////////// draw /////////////
   
   fadeOutTones();
   screen.update_value_display();
