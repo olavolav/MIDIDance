@@ -82,7 +82,10 @@ void setup() { /////////////////////////////////////////////////////////////////
     exit();
   }
   
-  if( BAYESIAN_MODE_ENABLED ) { println("Hit detector mode: Bayesian"); }
+  if( BAYESIAN_MODE_ENABLED ) {
+    println("Hit detector mode: Bayesian");
+    Phases.Recording = true;
+  }
   else { println("Hit detector mode: Max. velocity"); }
   
   size(600,400);
@@ -122,6 +125,8 @@ void draw() { //////////////////////////////////////////////////////////////////
   }
   delay(40);
   screen.simple_blenddown(BLENDDOWN_ALPHA);
+  
+  update_phases();
 }
 
 void keyPressed() {
