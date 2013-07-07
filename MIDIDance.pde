@@ -95,12 +95,12 @@ void keyPressed() {
   } else {
     switch(key) {
       case '+':
-        input.xthresh += 0.02;
-        screen.alert("xthresh = "+input.xthresh);
+        trigger.xthreshold += 0.02;
+        screen.alert("xthreshold = "+trigger.xthreshold);
         break;
       case '-':
-        input.xthresh -= 0.02;
-        screen.alert("xthresh = "+input.xthresh);
+        trigger.xthreshold -= 0.02;
+        screen.alert("xthreshold = "+trigger.xthreshold);
         break;
       case 'd':
         println("--- DEBUG INFO ---");

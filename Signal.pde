@@ -11,7 +11,6 @@ class Signal
   Pattern input_text_pattern;
   Axis[] axis_dim;
   int nr_groups = 2;
-  float xthresh = 0.2;
   int lines_read, numbers_read;
   boolean last_time_we_extracted_a_number = false;
   float time_of_first_signal_MS = -1.0;
@@ -62,7 +61,7 @@ class Signal
     for(int mm=0; mm<activeTones.length; mm++) {
       // println("DEBUG: signal group of this tone = "+activeTones[mm].associated_signal_group);
       if(activeTones[mm].associated_signal_group == s_group) {
-        println("DEBUG: There is a tone for signal group #"+s_group+" tone playing already!");
+        // println("DEBUG: There is a tone for signal group #"+s_group+" tone playing already!");
         return true;
       }
     }

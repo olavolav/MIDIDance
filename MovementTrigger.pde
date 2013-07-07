@@ -29,9 +29,11 @@ static class MovementTriggerTypes
 class MovementTrigger
 {
   int type;
+  float xthreshold;
   
   MovementTrigger(int t) {
     type = t;
+    xthreshold = 0.2;
   }
   
   int cycle_type() {
@@ -61,7 +63,7 @@ class MovementTrigger
             }
           }
         }
-        if(max_velocity > input.xthresh) {
+        if(max_velocity > this.xthreshold) {
           return axis_of_max_velocity;
         }
         break;
@@ -79,7 +81,7 @@ class MovementTrigger
             }
           }
         }
-        if(sqrt(sum_of_velocities_squared) > input.xthresh) {
+        if(sqrt(sum_of_velocities_squared) > this.xthreshold) {
           return axis_of_max_velocity;
         }
         break;
@@ -101,7 +103,7 @@ class MovementTrigger
             }
           }
         }
-        if(sqrt(sum_of_squared_deviations) > input.xthresh) {
+        if(sqrt(sum_of_squared_deviations) > this.xthreshold) {
           return axis_of_max_velocity;
         }
         break;
