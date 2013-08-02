@@ -7,6 +7,7 @@ final int MIDI_CHANNEL = 0;
 // String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";
 String MIDI_DEVICE_NAME = "LoopBe Internal MIDI";
 final int NUMBER_OF_SIGNALS = 3+3;
+final int NUMBER_OF_BUTTONS = 2+2;
 final boolean SIMULATE_SERIAL_INPUT = false;
 final int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 final int SERIAL_PORT_NUMBER = 0;
@@ -26,6 +27,8 @@ boolean BAYESIAN_MODE_ENABLED = true;
 String[] OUTCOMES_LABEL = { "R null", "L null", "R side hit ", "L reach pop", "R clock", "L up point", "L tut down", "L writst rotate", "R wrist rotate" };
 
 int[] MIDI_PITCH_CODES =  { -1, -1, 41, 43, 46, 52, 48, 51, 40 };
+//int[] MIDI_PITCH_CODES =  { -1, -1, 69, 69, 69, 52, 48, 51, 40 };
+int[] MIDI_BUTTON_CODES =  {72, 73, 74, 75};
 int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 1, 0, 1, 1, 1, 0};
 boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false, false, false, false};
 
