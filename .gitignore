@@ -1,7 +1,7 @@
-*.txt
+*.LocalConfig.pde
 *.eps
 *.indd
-.DS_Store
-
-LocalConfig.pde
-
+*.DS_Store
+*.txt
+*.pdf
+*.nb

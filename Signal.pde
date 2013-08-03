@@ -10,6 +10,7 @@ class Signal
   private String inBuffer = "";
   Pattern input_text_pattern;
   Axis[] axis_dim;
+  Button[] button_dim;
   int nr_groups = 2;
   int lines_read, numbers_read;
   boolean last_time_we_extracted_a_number = false;
@@ -22,11 +23,16 @@ class Signal
   Signal(PApplet app, boolean simulate_serial_input) {
     simulation = simulate_serial_input;
     // input_text_pattern = Pattern.compile("\\s*-?([0-9]+,){"+(NUMBER_OF_SIGNALS-1)+"}-?[0-9]+\\s+");
-    input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(1+(NUMBER_OF_SIGNALS/2-1)+1)+"}-?[0-9]+>\\s*");
-    axis_dim = new Axis[NUMBER_OF_SIGNALS];
+    input_text_pattern = Pattern.compile("\\s*<-?([0-9]+,){"+(1+(NUMBER_OF_SIGNALS+NUMBER_OF_BUTTONS)/2+1-1)+"}-?[0-9]+>\\s*");//(channel number,x,y,z,b1,b2,checksum)
     
+    axis_dim = new Axis[NUMBER_OF_SIGNALS];    
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
       axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k], SIGNAL_GROUP_OF_AXIS[k]);
+    }
+    
+    button_dim = new Button[NUMBER_OF_BUTTONS];    
+    for(int k=0; k<NUMBER_OF_BUTTONS; k++) {
+      button_dim[k] = new Button(MIDI_BUTTON_CODES[k]);
     }
     
     if (!simulation) {
@@ -118,6 +124,16 @@ class Signal
     return played_a_tone;
   }
   
+  boolean detect_button_press_and_send_command() {
+    for(int j=0; j<NUMBER_OF_BUTTONS; j++) {
+        if(input.button_dim[j].value < 1) {
+           button_dim[j].send_your_command(1.9);
+           screen.alert("button "+j+" presssed!");
+        }
+    }
+  return true;  
+  }
+  
   boolean get_next_data_point() {
     // read new numbers from buffer or input port
     if(this.extract_next_set_of_numbers_from_buffer()) return true;
@@ -157,16 +173,21 @@ class Signal
           for(int t=0; t<s_split.length; t++) { read_numbers[t] = int(s_split[t].trim()); }
           
           // Identify individual controllers based on the first number in the string
-          int axis_offset = 0;
-          if( read_numbers[0] == 2 && NUMBER_OF_SIGNALS > 3 ) { axis_offset = 3; } // <--- slight hack, but works for now
+          int axis_offset = 0; int button_offset = 0;
+          if( read_numbers[0] == 2 && NUMBER_OF_SIGNALS > 3 ) { axis_offset = 3; button_offset = 2; } // <--- slight hack, but works for now
           // Checksum test
           int sum = 0;
+
           for(int t=0; t<read_numbers.length-1; t++) { sum += read_numbers[t]; }
           if( sum == read_numbers[read_numbers.length-1] ) {
             // Passed checksum test
             for(int t=1; t<read_numbers.length-1; t++) {
-              this.axis_dim[t-1+axis_offset].value = read_numbers[t];
-              this.numbers_read++;
+              if( t < read_numbers.length-3 ) {  //axis numbers
+                this.axis_dim[t-1+axis_offset].value = read_numbers[t];
+              } else {                           //button numbers
+                this.button_dim[t-4+button_offset].value = read_numbers[t]; 
+              }
+              this.numbers_read++; 
             }
           } else {
             println("DEBUG: Numbers failed checksum test, ignoring line.");

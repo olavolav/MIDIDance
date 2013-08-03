@@ -18,28 +18,30 @@ class Tone
     // println("DEBUG: sending note with pitch "+pitch+" ...");
     myBus.sendNoteOn(channel, pitch, velocity);
     
-    if(BAYESIAN_MODE_ENABLED && !Phases.Init) {
-      new Hit(outcome, NULL_OUTCOME_FOR_SIGNAL_GROUP[associated_signal_group]);
-    }
-    
-    // append it to the list of active tones unless there is one with same the parameters c,p
-    boolean is_present = false;
-    for(int m=0; m<activeTones.length; m++) {
-      if(activeTones[m].channel == c && activeTones[m].pitch == p) {
-        activeTones[m].velocity = v;
-        activeTones[m].durationMS = d;
-        activeTones[m].startMS = millis();
-        activeTones[m].associated_signal_group = s;
-        is_present = true;
-        break;
+    if (!(outcome == -1)) {
+      if(BAYESIAN_MODE_ENABLED && !Phases.Init) {
+        new Hit(outcome, NULL_OUTCOME_FOR_SIGNAL_GROUP[associated_signal_group]);
       }
+      
+      // append it to the list of active tones unless there is one with same the parameters c,p
+      boolean is_present = false;
+      for(int m=0; m<activeTones.length; m++) {
+        if(activeTones[m].channel == c && activeTones[m].pitch == p) {
+          activeTones[m].velocity = v;
+          activeTones[m].durationMS = d;
+          activeTones[m].startMS = millis();
+          activeTones[m].associated_signal_group = s;
+          is_present = true;
+          break;
+        }
+      }
+      // println("debug in Tone: adding tone, is_present: "+int(is_present));
+      if(!is_present) {
+        // add this tone to list
+        activeTones = (Tone[])append(activeTones, this);
+      }
+      // println("DEBUG: new number of active tones: "+activeTones.length);
     }
-    // println("debug in Tone: adding tone, is_present: "+int(is_present));
-    if(!is_present) {
-      // add this tone to list
-      activeTones = (Tone[])append(activeTones, this);
-    }
-    // println("DEBUG: new number of active tones: "+activeTones.length);
   }
   
   void kill() {

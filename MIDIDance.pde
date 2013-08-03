@@ -69,6 +69,7 @@ void draw() { //////////////////////////////////////////////////////////////////
     } else { // during active phase
       input.send_controller_changes();
       input.detect_hit_and_play_tones();
+      input.detect_button_press_and_send_command();
     }
     screen.update_graphs();
   }
