@@ -1,5 +1,8 @@
 import themidibus.*;
 
+// Note about command to run this file in Processing 2.0:
+// $ processing-java --run --force --sketch=/Users/olav/Documents/Processing/MIDIDance/ --output=/tmp/processing/
+
 
 /////////////////////////////////////////////////////////////////// init /////////////
 
