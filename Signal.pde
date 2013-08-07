@@ -126,7 +126,7 @@ class Signal
   
   boolean detect_button_press_and_send_command() {
     for(int j=0; j<NUMBER_OF_BUTTONS; j++) {
-      if(input.button_dim[j].value < 1) {
+      if(input.button_dim[j].was_pressed_just_now()) {
         button_dim[j].send_your_command(0.5);
         screen.alert("button #"+j+" presssed!");
         println("button #"+j+" presssed!");
@@ -186,7 +186,7 @@ class Signal
               if( t < read_numbers.length-3 ) {  //axis numbers
                 this.axis_dim[t-1+axis_offset].value = read_numbers[t];
               } else {                           //button numbers
-                this.button_dim[t-4+button_offset].value = read_numbers[t]; 
+                this.button_dim[t-4+button_offset].new_value( read_numbers[t] ); 
               }
               this.numbers_read++; 
             }
@@ -201,17 +201,22 @@ class Signal
       }
     }
     else { // if simulated signal
-      for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-        axis_dim[k].value = round((10*k+lines_read)%height + random(0,10));
-        this.numbers_read++;
-      }
-      for(int k=0; k<NUMBER_OF_BUTTONS; k++) {
-        button_dim[k].value = 1;
-        if(random(0.0, 1.0) < 0.0015) {
-          button_dim[k].value = 0;
+      found_a_number = !last_time_we_extracted_a_number;  // HACK
+      if(found_a_number) {
+        for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
+          axis_dim[k].value = round((10*k+lines_read)%height + random(0,10));
+          this.numbers_read++;
+        }
+        for(int k=0; k<NUMBER_OF_BUTTONS; k++) {
+          int v = button_dim[k].value;
+          if(button_dim[k].value == 1) { // not pressed
+            if(random(0.0, 1.0) < 0.0015) { v = 0; }
+          } else { // pressed
+            if(random(0.0, 1.0) < 0.05) { v = 1; }
+          }
+          button_dim[k].new_value(v);
         }
       }
-      found_a_number = !last_time_we_extracted_a_number;  // HACK
       last_time_we_extracted_a_number = found_a_number;
     }
 
