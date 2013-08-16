@@ -30,7 +30,8 @@ String[] OUTCOMES_LABEL = { "R null", "L null", "R side hit ", "L reach pop", "R
 int[] MIDI_PITCH_CODES =  { -1, -1, 41, 43, 46, 52, 48, 51, 40 };
 int[] SIGNAL_GROUP_OF_OUTCOME = {0, 1, 0, 1, 0, 1, 1, 1, 0};
 boolean[] SKIP_OUTCOME_WHEN_EVALUATING_BAYESIAN_DETECTOR = {true, true, false, false, false, false, false, false, false};
-int[] MIDI_BUTTON_CODES =  {72, 73, 74, 75};
+// int[] MIDI_BUTTON_CODES =  {72, 73, 74, 75};
+final int[][] MIDI_BUTTON_CODES = {{72, 73}, {73}, {74}, {75}};
 int[] NULL_OUTCOME_FOR_SIGNAL_GROUP = {0, 1};
 int MAX_NUMBER_OF_EVENTS_FOR_LEARNING = 100;
 // Note: Make sure the following outcomes are from all possible signal groups

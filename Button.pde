@@ -2,12 +2,15 @@ class Button
 {
   String label;
   int value, old_value;
-  int midi_pitch = -1;
+  // int midi_pitch = -1;
+  int[] midi_pitch_list;
+  int cycle_index;
   int millisecond_time_of_last_button_press = 0;
   
-  Button(String l, int pitch) {
+  Button(String l, int[] pitches) {
     label = l;
-    midi_pitch = pitch;
+    midi_pitch_list = pitches;
+    cycle_index = 0;
   }
   
   String status_string() {
@@ -19,11 +22,17 @@ class Button
       status += "◦"; // "X";
     }
     
+    if(this.is_cycle_button()) {
+      status += " step " + (this.cycle_index + 1);
+    }
+    
     return status;
   }
   
   void send_your_command(float velocity) {
-    new Tone(MIDI_CHANNEL, this.midi_pitch, round(127*velocity), TONE_LENGTH, -1, -1);
+    int code = this.midi_pitch_list[cycle_index];
+    new Tone(MIDI_CHANNEL, code, round(127*velocity), TONE_LENGTH, -1, -1);
+    cycle_index = (cycle_index + 1) % this.midi_pitch_list.length;
   }
   
   void new_value(int v) {
@@ -40,7 +49,11 @@ class Button
   }
   
   boolean is_currently_in_pressed_state() {
-    return (value == 0);
+    return (this.value == 0);
+  }
+  
+  boolean is_cycle_button() {
+    return this.midi_pitch_list.length > 1;
   }
   
 }
