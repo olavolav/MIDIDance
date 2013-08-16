@@ -31,7 +31,7 @@ class Button
   
   void send_your_command(float velocity) {
     int code = this.midi_pitch_list[cycle_index];
-    new Tone(MIDI_CHANNEL, code, round(127*velocity), TONE_LENGTH, -1, -1);
+    new Tone(MIDI_CHANNEL_FOR_CONTROLLERS_AND_BUTTONS, code, round(127*velocity), TONE_LENGTH, -1, -1);
     cycle_index = (cycle_index + 1) % this.midi_pitch_list.length;
   }
   

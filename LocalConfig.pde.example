@@ -2,6 +2,7 @@ String RECORDED_HITS_OUTPUT_FILE = "test-17-2036.txt";
 String RECORDED_HITS_INPUT_FILE = RECORDED_HITS_OUTPUT_FILE;
 
 final int MIDI_CHANNEL = 0;
+final int MIDI_CHANNEL_FOR_CONTROLLERS_AND_BUTTONS = 1;
 // String MIDI_DEVICE_NAME = "IAC-Bus 1";
 //String MIDI_DEVICE_NAME = "Java Sound Synthesizer";
 // String MIDI_DEVICE_NAME = "Native Instruments Kore Player Virtual Input";

@@ -76,10 +76,9 @@ class Signal
   
   boolean send_controller_changes() {
     boolean updated_a_controller = false;
-
     for(j=0; j<NUMBER_OF_SIGNALS; j++) {
       if( !axis_dim[j].is_instrument && abs(axis_dim[j].normalized_old_value()-axis_dim[j].value) > 0.01 ) {
-        myBus.sendControllerChange(MIDI_CHANNEL, j, round(127*axis_dim[j].normalized_value())); // Send a controllerChange
+        myBus.sendControllerChange(MIDI_CHANNEL_FOR_CONTROLLERS_AND_BUTTONS, j, round(127*axis_dim[j].normalized_value()));
         updated_a_controller = true;
       }
     }
@@ -88,7 +87,6 @@ class Signal
   
   boolean detect_hit_and_play_tones() {
     int triggering_axis = -1;
-    // int signal_group_of_max_velocity = 0;
     boolean played_a_tone = false;
     
     for(int group=0; group<this.nr_groups; group++) {
