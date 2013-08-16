@@ -1,12 +1,14 @@
 class Axis
 {
+  String label;
   int value;
   int value_min, value_max;
   int signal_group = 0;
   boolean is_instrument = true;
   float[] last_values_buffer;
 
-  Axis(boolean instr, int sg) {
+  Axis(String l, boolean instr, int sg) {
+    label = l;
     value = 0;
     value_min = Integer.MAX_VALUE;
     value_max = Integer.MIN_VALUE;
@@ -18,7 +20,15 @@ class Axis
       last_values_buffer[t] = 0.0;
     }
   }
-
+  
+  String status_string() {
+    String status = this.label;
+    if(!this.is_instrument) label += " (ctrl)";
+    status += ": "+this.value;
+    
+    return status;
+  }
+  
   void update_min_and_max() {
     if(this.value < this.value_min) this.value_min = this.value;
     if(this.value > this.value_max) this.value_max = this.value;

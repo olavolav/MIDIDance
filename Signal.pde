@@ -27,12 +27,12 @@ class Signal
     
     axis_dim = new Axis[NUMBER_OF_SIGNALS];    
     for(int k=0; k<NUMBER_OF_SIGNALS; k++) {
-      axis_dim[k] = new Axis(MIDI_SIGNAL_IS_AN_INSTRUMENT[k], SIGNAL_GROUP_OF_AXIS[k]);
+      axis_dim[k] = new Axis(AXIS_LABELS[k%(AXIS_LABELS.length)], MIDI_SIGNAL_IS_AN_INSTRUMENT[k], SIGNAL_GROUP_OF_AXIS[k]);
     }
     
     button_dim = new Button[NUMBER_OF_BUTTONS];    
     for(int k=0; k<NUMBER_OF_BUTTONS; k++) {
-      button_dim[k] = new Button(MIDI_BUTTON_CODES[k]);
+      button_dim[k] = new Button(BUTTON_LABELS[k%(BUTTON_LABELS.length)], MIDI_BUTTON_CODES[k]);
     }
     
     if (!simulation) {
@@ -128,8 +128,8 @@ class Signal
     for(int j=0; j<NUMBER_OF_BUTTONS; j++) {
       if(input.button_dim[j].was_pressed_just_now()) {
         button_dim[j].send_your_command(0.5);
-        screen.alert("button #"+j+" presssed!");
-        println("button #"+j+" presssed!");
+        screen.alert("button #"+j+" ("+button_dim[j].label+") presssed!");
+        println("button #"+j+" ("+button_dim[j].label+") presssed!");
       }
     }
     return true;  

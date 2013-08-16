@@ -11,12 +11,15 @@ class Display
     String label;
     textSize(20);
     textAlign(LEFT, CENTER);
+    // print values of axis
     for(int j=0; j<NUMBER_OF_SIGNALS; j++) {
-      label = AXIS_LABELS[j%(AXIS_LABELS.length)];
-      if(!input.axis_dim[j].is_instrument) label += " (ctrl)";
-      
       fill(line_color(j),200);
-      text(label+" #"+j+": "+input.axis_dim[j].value,10,20*j+10);
+      text(input.axis_dim[j].status_string(), 10, 20*j+10);
+    }
+    // print button states
+    fill(#ffffff, 200);
+    for(int j=0; j<NUMBER_OF_BUTTONS; j++) {
+      text(input.button_dim[j].status_string(), 10, 20*(j+NUMBER_OF_SIGNALS)+10);
     }
   }
   

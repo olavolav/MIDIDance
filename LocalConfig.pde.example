@@ -8,6 +8,7 @@ final int MIDI_CHANNEL = 0;
 String MIDI_DEVICE_NAME = "LoopBe Internal MIDI";
 final int NUMBER_OF_SIGNALS = 3+3;
 final int NUMBER_OF_BUTTONS = 2+2;
+final String[] BUTTON_LABELS = {"btnL1", "btnL2", "btnR1", "btnR2"};
 final boolean SIMULATE_SERIAL_INPUT = false;
 final int NUMBER_OF_LINES_TO_SKIP_ON_INIT = 10;
 final int SERIAL_PORT_NUMBER = 0;

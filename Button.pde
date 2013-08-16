@@ -1,12 +1,25 @@
 class Button
 {
-  
+  String label;
   int value, old_value;
   int midi_pitch = -1;
   int millisecond_time_of_last_button_press = 0;
   
-  Button(int pitch) {
+  Button(String l, int pitch) {
+    label = l;
     midi_pitch = pitch;
+  }
+  
+  String status_string() {
+    String status = this.label+": ";
+    
+    if(this.is_currently_in_pressed_state()) {
+      status += "●"; // "O";
+    } else {
+      status += "◦"; // "X";
+    }
+    
+    return status;
   }
   
   void send_your_command(float velocity) {
@@ -24,6 +37,10 @@ class Button
       return true;
     }
     return false;
+  }
+  
+  boolean is_currently_in_pressed_state() {
+    return (value == 0);
   }
   
 }
